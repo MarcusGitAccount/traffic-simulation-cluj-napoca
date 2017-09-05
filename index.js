@@ -19,7 +19,7 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/api', apiRouter);
 
 app.get('/', (request, response) => {
-  response.status(200).redirect('/assets').send('root path');
+  response.status(200).redirect('/assets');
 });
 
 app.get('*', (request, response) => {
