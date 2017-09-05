@@ -61,7 +61,7 @@ class Car {
     this.elapsed += delta;
     
     if (this.elapsed >= this.interval) {
-      this.elapsed -= this.interval;
+      this.elapsed = 0;
       callback();
     }
   }
@@ -132,10 +132,15 @@ function init() {
     context.fillRect(x, y, car.scale, car.scale, car.scale);
   }
   
-  
+  let timeout = 0;
   
   for (const piece of roadPieces) {
-    window.setTimeout(() => cars[0].road = piece, 1000)
+    timeout += 500;
+    
+    window.setTimeout(() => {
+      cars[0].road = piece;
+      
+    }, timeout);
   }
   
   window.requestAnimFrame(step);
