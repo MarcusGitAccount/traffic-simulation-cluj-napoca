@@ -10,3 +10,16 @@
 {lat: 46.77411534946648, lng: 23.59037697315216}
 {lat: 46.77486850663835, lng: 23.58968496322632}
 */
+
+class Road {
+  constructor(position, next, options = null, drawingOptions = {lineWidth: 1}, direction = 'up') {
+    this.scale = 10;
+    this.position = position;
+    this.options = options;
+    this.next = next;
+    this.direction = 'up';
+    this.drawingOptions = drawingOptions;
+  }
+}
+
+export default Road;
