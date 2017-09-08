@@ -39,7 +39,6 @@ module.exports = (router) => {
         
         data.forEach(item => {
           const bound = item.routes[0].bounds;
-          
           if (bound.northeast.lat > bounds.northeast.lat)
             bounds.northeast.lat = bound.northeast.lat;
           if (bound.northeast.lng > bounds.northeast.lng)
