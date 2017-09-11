@@ -22,8 +22,8 @@ class Road {
     this.start = start; // x, y
     this.end = end;
     this.distance = distance; // m
-    this.lanes = lane.number;
-    this.laneWidth = lane.width ;
+  //  this.lanes = lane.number;
+  //  this.laneWidth = lane.width ;
     this.isMockup = isMockup;
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;

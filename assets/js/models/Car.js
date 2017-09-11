@@ -31,9 +31,7 @@ class Car {
 
   draw(angle) {
     this.updatePosition(angle);
-    
-    console.log(`angle: ${angle}`)
-    
+
     const {x, y} = this.position;
     const end = point2D(
       x + this.length * Math.cos(angle),

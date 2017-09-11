@@ -81,19 +81,25 @@ function testForColiniarity(A, B, C) {
     [C.x, C.y, 1],
   ]);
   
-  if (result !== 0)
-    console.log(`Determinant not 0: ${result}`, A, B);
-  
-  return Math.abs(result) < 1e-10;
+  return checkIfCloseAFToZero(result); 
 }
 
+function checkIfCloseAFToZero(value) {
+  return Math.abs(value) < 1e-10;
+}
+
+function fixDecimals(nbr, points) {
+	const phase = Math.pow(10, points);
+
+	return Math.floor(nbr * phase) / phase;
+}
 
 function testForPointInSegment(point, segment) {
-  if (distanceBetween2DPoints(point, segment.start) + distanceBetween2DPoints(point, segment.end) === distanceBetween2DPoints(segment.start, segment.end)) {
-    return true;
-  }
   
-  return false;
+  const firstDistance = distanceBetween2DPoints(point, segment.start) + distanceBetween2DPoints(point, segment.end);
+  const secondDistance = distanceBetween2DPoints(segment.start, segment.end);
+  
+  return fixDecimals(firstDistance, 8) === fixDecimals(secondDistance, 8);
 }
 
 export {
