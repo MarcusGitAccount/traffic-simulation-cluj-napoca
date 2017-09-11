@@ -10,30 +10,25 @@
   {lat: 46.77411534946648, lng: 23.59037697315216}
   {lat: 46.77486850663835, lng: 23.58968496322632}
 */
+
 'use strict';
-/*
-class Road {
-  constructor(position, next, options = null, drawingOptions = {lineWidth: 1}, direction = 'up') {
-    this.scale = 10;
-    this.position = position;
-    this.options = options;
-    this.next = next;
-    this.direction = 'up';
-    this.drawingOptions = drawingOptions;
-  }
-}
-*/
+
+import {radToDegrees} from './Utils.js';
+
+const _slope = Symbol('_slope');
 
 class Road {
-  constructor(start, end, distance, lanes, isMockup = false, drawingOptions = null) {
+  constructor(start, end, distance, lane, isMockup = false, drawingOptions = null) {
     this.start = start; // x, y
     this.end = end;
     this.distance = distance; // m
-    this.lanes = lanes;
+    this.lanes = lane.number;
+    this.laneWidth = lane.width ;
     this.isMockup = isMockup;
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
     this.cars = [];
+    this[_slope] = null;
   }
   
   addCar(car) {
@@ -49,6 +44,13 @@ class Road {
     window.globalContext.moveTo(this.start.x, this.start.y);
     window.globalContext.lineTo(this.end.x, this.end.y);
     window.globalContext.stroke();
+  }
+  
+  get slope() {
+    if (!this[_slope])
+      this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
+      
+    return this[_slope];
   }
 }
 
