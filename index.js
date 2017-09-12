@@ -5,6 +5,17 @@ const path = require('path');
 const morgan = require('morgan');
 const express = require('express');
 const bodyParser = require('body-parser');
+const proj4 = require('proj4');
+
+const utm = "+proj=utm +zone=34t";
+const wgs84 = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs";
+
+proj4.defs(
+  ['wgs84', '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'],
+  ['utm', '+proj=utm +zone=34t']
+);
+
+const coords = [23.558636, 46.796938];
 
 const app = express();
 

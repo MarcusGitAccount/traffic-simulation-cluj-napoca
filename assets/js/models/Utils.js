@@ -95,7 +95,6 @@ function fixDecimals(nbr, points) {
 }
 
 function testForPointInSegment(point, segment) {
-  
   const firstDistance = distanceBetween2DPoints(point, segment.start) + distanceBetween2DPoints(point, segment.end);
   const secondDistance = distanceBetween2DPoints(segment.start, segment.end);
   

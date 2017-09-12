@@ -13,25 +13,26 @@
 
 'use strict';
 
-import {radToDegrees} from './Utils.js';
+import {radToDegrees, distanceBetween2DPoints} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
 class Road {
-  constructor(start, end, distance, lane, isMockup = false, drawingOptions = null) {
+  constructor(start, end, drivingOptions, lane, drawingOptions = null) {
     this.start = start; // x, y
     this.end = end;
-    this.distance = distance; // m
-  //  this.lanes = lane.number;
-  //  this.laneWidth = lane.width ;
-    this.isMockup = isMockup;
+    this.distance = distanceBetween2DPoints(start, end); // m
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
     this.cars = [];
+    this.drivingOptions = drivingOptions;
     this[_slope] = null;
   }
   
   addCar(car) {
+    if (this.drivingOptions && this.drivingOptions.speedLimit < car.velocity)
+      car.velocity = this.drivingOptions.speedLimit;
+    
     this.cars.push(car);
   }
   
@@ -44,6 +45,29 @@ class Road {
     window.globalContext.moveTo(this.start.x, this.start.y);
     window.globalContext.lineTo(this.end.x, this.end.y);
     window.globalContext.stroke();
+  }
+  
+  get minimumCarVelocity() {
+    let _min = 999;
+    
+    for (const car of this.cars)
+      if (car.velocity < _min)
+        _min = car.velocity;
+        
+    return _min;
+  }
+  
+  adaptSpeed() {
+    for (let index = 0; index < this.cars.length; index++) {
+      const _min = this.minimumCarVelocity;
+      
+      if (this.cars[index].velocity !== this.minimumCarVelocity)
+        this.cars[index].velocity = _min;
+      else if (this.cars[index].maxSpeed < this.drivingOptions.maxSpeed)
+        this.cars[index].velocity += .1;
+      else if (this.cars[index].maxSpeed > this.drivingOptions.maxSpeed)
+        this.cars[index].velocity -= .55;
+    }
   }
   
   get slope() {

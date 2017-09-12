@@ -4,21 +4,23 @@
 import {point2D} from './Utils.js';
 
 const _road = Symbol('_road');
+const _velocity = Symbol('_velocity');
 
 const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 5};
 
 
 class Car {
-  constructor(id, position, width, length, lane, velocity, type = null, drawingOptions = defaultDrawingOptions) {
+  constructor(id, position, width, length, lane, velocity, specs, drawingOptions = defaultDrawingOptions) {
     this.id = id;
     this.width = width;
     this.length = length;
     this.lane = lane;
-    this.velocity = velocity; // for both X and Y
+    this.velocity = velocity;
     this.position = position;
-    this.type = type;
+    this.specs = specs;
     this.drawingOptions = drawingOptions;
   }
+
 
   updatePosition(angle) {
     const {x, y} = this.position;
@@ -44,8 +46,6 @@ class Car {
     window.globalContext.strokeStyle = this.drawingOptions.strokeColor;
     window.globalContext.lineTo(end.x, end.y);
     window.globalContext.stroke();
-
-    this.position = end;
   }
 }
 

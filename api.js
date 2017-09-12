@@ -1,9 +1,24 @@
 'use strict';
 
 const fetch = require('node-fetch');
+const proj4 = require('proj4');
+
+const projections = {
+  utm: "+proj=utm +zone=34t",
+  wgs84: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+};
 
 function startEnd(start, end) {
   return {start, end};
+}
+
+function getUtm(coords) {
+  const result =  proj4(projections.wgs84, projections.utm, [coords.lng, coords.lat]);
+  
+  return {
+    easting: result[0], // oX
+    northing: result[1] // oY
+  };
 }
 
 const centerSquarePoints = [
@@ -39,6 +54,7 @@ module.exports = (router) => {
         
         data.forEach(item => {
           const bound = item.routes[0].bounds;
+
           if (bound.northeast.lat > bounds.northeast.lat)
             bounds.northeast.lat = bound.northeast.lat;
           if (bound.northeast.lng > bounds.northeast.lng)
@@ -51,22 +67,40 @@ module.exports = (router) => {
         });
         
         data.forEach(item => {
-          points.push(...item.routes[0].legs[0].steps.map(step => {
+          points.push(item.routes[0].legs[0].steps.map(step => {
             return {
-              start: step.start_location,
-              end: step.end_location,
+              start: {
+                wgs84: step.start_location,
+                utm: getUtm(step.start_location)
+              },
+              end: {
+                wgs84: step.end_location,
+                utm: getUtm(step.end_location)
+              },
               distance: step.distance.value
             };
           }));
         });
         
-        return Promise.resolve({points, bounds});
+        const _bounds = {
+          northeast: {
+            wgs84: bounds.northeast,
+            utm: getUtm(bounds.northeast)
+          },
+          southwest: {
+            wgs84: bounds.southwest,
+            utm: getUtm(bounds.southwest)
+          }
+        };
+        
+        return Promise.resolve({points, bounds, _bounds});
       })
       .then(dataSet => {
-        const {points, bounds} = dataSet;
-        const totalDistance = points.reduce((prev, current) => prev + current.distance, 0);
-
-        response.status(200).json({points, bounds, totalDistance});
+        const {points, _bounds} = dataSet;
+        
+        console.log('****');
+        
+        response.status(200).json({points, _bounds/*, totalDistance*/});
       })
       .catch(error => {
         response.status(204).send(new Error(error));
