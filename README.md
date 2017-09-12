@@ -16,9 +16,9 @@ http://prntscr.com/gke16s
 
 ## Installation
 
-clone the repo and run:
--npm i
--npm start
+- clone the repo
+- npm i
+- npm start
 
 ## License
 
