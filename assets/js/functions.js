@@ -1,11 +1,16 @@
+/*
+  Make code:
+ (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
+*/
+
 'use strict';
 
 import {default as Car} from './models/Car.js';
 import {default as Road} from './models/Road.js';
 import {
-  point2D, 
   getRequestAnimationFrameFunction as getRequestAnimFrame, 
-  testForPointInSegment
+  testForPointInSegment,
+  latLngToCanvasXY
 } from './models/Utils.js';
 
 const canvas = document.querySelector('canvas');
@@ -24,6 +29,8 @@ const roads = [/*
   new Road(point2D(510, 660), point2D(999, 660), {maxSpeed: 2   })*/
 ];
 
+const colorsArray = ['#E65100', '#607D8B', 'red', 'cyan', 'pink', '#1B5E20', '#18FFFF', '#311B92'];
+
 let cars = [
 /*new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
 new Car(2, roads[1].start, 10, 7.5, null,  .5, {maxSpeed: 1   }),
@@ -36,24 +43,53 @@ new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 })*/
   canvas.height = 750;
   
   window.fetch(`${window.location.origin}/api/points`)
-        .then(response => response.json())
+        .then(async function(response) {
+          return await response.json();
+        })
         .then(data => {
-          console.log(data)
+          const leftTopBounds = {
+            x: data._bounds.southwest.utm.easting,
+            y: data._bounds.southwest.utm.northing
+          };
+          
+          const bounds = {
+            minLat: data._bounds.southwest.wgs84.lat,
+            maxLat: data._bounds.northeast.wgs84.lat,
+            minLng: data._bounds.southwest.wgs84.lng,
+            maxLng: data._bounds.northeast.wgs84.lng,
+          };
+          
+          const dimensions = {
+            width: canvas.width,
+            height: canvas.height
+          };
+          
+          let colorIndex = 0;
           
           for (const dataArray of data.points) {
             for (const point of dataArray) {
-              roads.push(new Road(
-                point2D(Math.floor(point.start.utm.easting % 1000) , Math.floor(point.start.utm.northing % 1000)),
-                point2D(Math.floor(point.end.utm.easting % 1000), Math.floor(point.end.utm.northing % 1000)),
-                {maxSpeed: 2}
+              roads.push(new Road(/*
+                point2D(Math.floor(point.start.utm.easting - leftTopBounds.x) , Math.floor(point.start.utm.northing - leftTopBounds.y)),
+                point2D(Math.floor(point.end.utm.easting - leftTopBounds.x), Math.floor(point.end.utm.northing - leftTopBounds.y)),*/
+                latLngToCanvasXY(point.start.wgs84, bounds, dimensions),
+                latLngToCanvasXY(point.end.wgs84, bounds, dimensions),
+                {maxSpeed: 2},
+                null,
+                {strokeColor: colorsArray[colorIndex % colorsArray.length], lineWidth: 1}
               ));
+              
             }
+            
+            colorIndex++;
+
           }
 
           return Promise.resolve(true);
         })
         .then(done => {
-          console.log(roads);
+          for (const road of roads) {
+            console.log(road.start, road.end);
+          }
           
           cars = [
             new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
@@ -102,3 +138,4 @@ function animationStep(timestamp) {
   
   window.requestAnimFrame(animationStep);
 }
+

@@ -11,17 +11,40 @@
   {lat: 46.77486850663835, lng: 23.58968496322632}
 */
 
+/*[
+  {lat: 46.773781379807524,lng: 23.58806787222754},
+  {lat: 46.77488095105854, lng: 23.589667275956423},
+  {lat: 46.77488095105854, lng: 23.589667275956423},
+  {lat: 46.775623000948556,lng: 23.59058520784507},
+  {lat: 46.775623000948556,lng: 23.59058520784507},
+  {lat: 46.77471540405222, lng: 23.59181175856475},
+  {lat: 46.77471540405222,lng: 23.59181175856475},
+  {lat: 46.77429367376812,lng: 23.592295011235933},
+  {lat: 46.77471540405222,lng: 23.59181175856475},
+  {lat: 46.77419829442854,lng: 23.592122984174388},
+  {lat: 46.77429367376812,lng: 23.592295011235933},
+  {lat: 46.77419829442854,lng: 23.592122984174388},
+  {lat: 46.77488095105854,lng: 23.589667275956423},
+  {lat: 46.77411916855766,lng: 23.590376558733723},
+  {lat: 46.77419829442854,lng: 23.592122984174388},
+  {lat: 46.77411916855766,lng: 23.590376558733723},
+  {lat: 46.77411916855766,lng: 23.590376558733723},
+  {lat: 46.77370555612028,lng: 23.58821318920320}
+]
+*/
 'use strict';
 
 import {radToDegrees, distanceBetween2DPoints} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
+const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 5};
+
 class Road {
-  constructor(start, end, drivingOptions, lane, drawingOptions = null) {
+  constructor(start, end, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {
     this.start = start; // x, y
     this.end = end;
-    this.distance = distanceBetween2DPoints(start, end); // m
+    this.distance = distanceBetween2DPoints(start, end);
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
     this.cars = [];
@@ -42,6 +65,8 @@ class Road {
   
   draw() {
     window.globalContext.beginPath();
+    window.globalContext.strokeStyle = this.drawingOptions.strokeColor;
+    window.globalContext.lineWidth = this.drawingOptions.lineWidth;
     window.globalContext.moveTo(this.start.x, this.start.y);
     window.globalContext.lineTo(this.end.x, this.end.y);
     window.globalContext.stroke();
@@ -77,5 +102,4 @@ class Road {
     return this[_slope];
   }
 }
-
 export default Road;

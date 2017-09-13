@@ -28,6 +28,6 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
     "morgan": "^1.8.2",
-    "node-fetch": "^1.7.2",
+    "node-fetch": "^1.7.2"
   }
 }

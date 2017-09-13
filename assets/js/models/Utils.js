@@ -101,10 +101,20 @@ function testForPointInSegment(point, segment) {
   return fixDecimals(firstDistance, 8) === fixDecimals(secondDistance, 8);
 }
 
+function latLngToCanvasXY(coords, bounds, canvasDimensions) {
+  console.log(coords, bounds, canvasDimensions)
+  
+  return point2D(
+    ((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * canvasDimensions.width,
+    ((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * canvasDimensions.height
+  );
+}
+
 export {
   point2D, distanceBetween2DPoints,
   getRequestAnimationFrameFunction, 
   vector2D, angleBetween2DVectors, segmentToVector,
   degreesToRad, radToDegrees,
-  segmentSlope, testForColiniarity, testForPointInSegment
+  segmentSlope, testForColiniarity, testForPointInSegment,
+  latLngToCanvasXY
 };
