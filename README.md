@@ -22,5 +22,5 @@ http://prntscr.com/gke16s
 
 ## License
 
-MIT (link/file to be added)
+<a href="https://github.com/MarcusGitAccount/traffic-simulation-cluj-napoca/blob/master/gplv3.txt">License link</a>
 

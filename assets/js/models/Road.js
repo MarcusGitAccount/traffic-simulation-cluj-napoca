@@ -38,7 +38,7 @@ import {radToDegrees, distanceBetween2DPoints} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
-const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 5};
+const defaultDrawingOptions = {strokeColor: '##eee', lineWidth: 1};
 
 class Road {
   constructor(start, end, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {

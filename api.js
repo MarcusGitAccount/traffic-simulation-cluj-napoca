@@ -71,7 +71,7 @@ module.exports = (router) => {
   });
   
   router.get('/points', (request, response) => {
-    Promise.all(centerSquarePoints.map(async function(pair) {
+  /*    Promise.all(centerSquarePoints.map(async function(pair) {
       return await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${pair.start.lat},${pair.start.lng}&destination=${pair.end.lat},${pair.end.lng}`);
     }))
       .then(async function(responses) {
@@ -136,11 +136,33 @@ module.exports = (router) => {
       .then(dataSet => {
         const {points, _bounds} = dataSet;
         
-        response.status(200).json({points, _bounds/*, totalDistance*/});
+        response.status(200).json({points, _bounds, totalDistance});
       })
       .catch(error => {
         response.status(204).send(new Error(error));
-      });
+      });*/
+    const bounds = {
+      minLat:  999,
+      maxLat: -999,
+      minLng:  999,
+      maxLng: -999
+    };  
+    
+    for (const pair of centerSquarePoints) {
+      for (const prop in pair) {
+        if (pair[prop].lat > bounds.maxLat)
+          bounds.maxLat = pair[prop].lat;
+        else if (pair[prop].lat < bounds.minLat)
+          bounds.minLat = pair[prop].lat;
+
+        if (pair[prop].lng > bounds.maxLng)
+          bounds.maxLng = pair[prop].lng;
+        else if (pair[prop].lng < bounds.minLng)
+          bounds.minLng = pair[prop].lng;
+      }
+    }
+    
+    response.status(200).json({pairs: centerSquarePoints, bounds: bounds});
   });
 
   return router;

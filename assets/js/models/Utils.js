@@ -105,9 +105,16 @@ function latLngToCanvasXY(coords, bounds, canvasDimensions) {
   // console.log(coords, bounds, canvasDimensions)
   
   return point2D(
-    ((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * canvasDimensions.width,
-    ((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * canvasDimensions.height
+    Math.floor(((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) *  canvasDimensions.width),
+    Math.floor(((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * canvasDimensions.height)
   );
+}
+
+function randomInt(min, max) {
+  if (max === 0 && min === max)
+    return -1;
+  
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
 export {
@@ -116,5 +123,5 @@ export {
   vector2D, angleBetween2DVectors, segmentToVector,
   degreesToRad, radToDegrees,
   segmentSlope, testForColiniarity, testForPointInSegment,
-  latLngToCanvasXY
+  latLngToCanvasXY, randomInt
 };
