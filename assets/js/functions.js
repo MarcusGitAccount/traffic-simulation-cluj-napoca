@@ -12,6 +12,7 @@ import {
   testForPointInSegment,
   latLngToCanvasXY
 } from './models/Utils.js';
+import {default as DirectedGraph} from './models/DirectedGraph.js';
 
 const canvas = document.querySelector('canvas');
 
@@ -87,9 +88,9 @@ new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 })*/
           return Promise.resolve(true);
         })
         .then(done => {
-          for (const road of roads) {
+/*          for (const road of roads) {
             console.log(road.start, road.end);
-          }
+          }*/
           
           cars = [
             new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
@@ -139,3 +140,17 @@ function animationStep(timestamp) {
   window.requestAnimFrame(animationStep);
 }
 
+const graph = new DirectedGraph();
+
+graph.addVertices(1, 2, 3, 4, 5, 6, 7);
+
+graph.addEdge(1, 2);
+graph.addEdge(1, 3);
+graph.addEdge(3, 4);
+graph.addEdge(5, 3);
+graph.addEdge(2, 6);
+graph.addEdge(2, 5);
+graph.addEdge(6, 7);
+graph.addEdge(7 ,2);
+
+console.log(graph.debug);
