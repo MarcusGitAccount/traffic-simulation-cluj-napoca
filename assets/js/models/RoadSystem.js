@@ -17,9 +17,6 @@ class RoadSystem extends DirectedGraph {
   }
   
   getRandomEdge(vertexId) {
-/*  console.log('edges: ', this.vertexEdges(vertexId))
-    console.log('random integer: ', randomInt(0, this.vertexEdgesNumber(vertexId)));
-*/
     return this.vertexEdges(vertexId).getItemAtPosition(randomInt(0, this.vertexEdgesNumber(vertexId)));
   }
   
@@ -31,7 +28,7 @@ class RoadSystem extends DirectedGraph {
             this.roadsArray[i].end.y === this.roadsArray[j].start.y &&
             i != j) 
         {
-          console.log(`${i} -> ${j}`);
+          // console.log(`${i} -> ${j}`);
           this.addEdge(i, j);
         }
       }

@@ -8,7 +8,8 @@
   vertices =  nodes
 */
 
-const _adjacencyList = Symbol('_adjacencyList');
+const _adjacencyList = Symbol('_adjacencyList'); // Symbols for private properties
+const _dfs = Symbol('_dfs');
 
 (function updateSetPrototype() {
   Set.prototype.getItemAtPosition = function(position) {
@@ -29,12 +30,26 @@ const _adjacencyList = Symbol('_adjacencyList');
 class DirectedGraph {
   constructor() {
     this[_adjacencyList] = {};
+    this[_dfs] = {
+      visited: [],
+      result: [],
+      dfs: (vertex) => {
+        this[_dfs].visited[vertex] = true;
+        this[_dfs].result.push(vertex);
+        
+        for (const neighbour of this[_adjacencyList][vertex])
+          if (!this[_dfs].visited[neighbour])
+            this[_dfs].dfs(neighbour);
+      }
+    };
   }
 
   addVertices(...vertexIds) {
     // create new list
-    for (const id of vertexIds)
-      this[_adjacencyList][id] = new Set(); // update to Sets after the concept works
+    for (const id of vertexIds) {
+      this[_adjacencyList][id] = new Set();
+      this[_dfs].visited[id] = false;
+    }
   }
   
   removeVertex(vertexId) {
@@ -50,6 +65,13 @@ class DirectedGraph {
   
   checkIfVertexExists(vertexId) {
     return this[_adjacencyList].hasOwnProperty(vertexId);
+  }
+  
+  checkIfEdgeExists(firstVertex, secondVertex) {
+    if (!this.checkIfVertexExists(firstVertex) || !this.checkIfVertexExists(secondVertex))
+      return false;
+      
+    return this[_adjacencyList][firstVertex].has(secondVertex);
   }
   
   addEdge(firstVertex, secondVertex) {
@@ -84,6 +106,38 @@ class DirectedGraph {
   
   get verticesList() {
     return this[_adjacencyList];
+  }
+  
+  dfs(start) {
+    this[_dfs].result = [];
+    this[_dfs].visited = this[_dfs].visited.map(_ => false);
+    this[_dfs].dfs(start);
+
+    return this[_dfs].result;
+  }
+  
+  bfs(start) {
+    const result = [];
+    const size = this.veritecesNumber;
+    const visited = [...new Array(size + 1)].fill(false);
+    const queue = [];
+    
+    queue.push(start);
+    visited[start] = true;
+    
+    while (queue.length > 0) {
+      const top = queue.shift();
+      
+      result.push(top);
+      for (const neighbour of this[_adjacencyList][top]) {
+        if (visited[neighbour] === false) {
+          queue.push(neighbour);
+          visited[neighbour] = true;
+        }
+      }
+    }
+    
+    return result;
   }
 }
 

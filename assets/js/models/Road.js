@@ -34,7 +34,7 @@
 */
 'use strict';
 
-import {radToDegrees, distanceBetween2DPoints} from './Utils.js';
+import {distanceBetween2DPoints} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
