@@ -56,7 +56,7 @@ class BinaryHeap {
     
     if (left < this.size && !this.cmpFunction(this[_heap][largest], this[_heap][left]))
       largest = left;
-    else if (right < this.size && !this.cmpFunction(this[_heap][largest], this[_heap][right]))
+    if (right < this.size && !this.cmpFunction(this[_heap][largest], this[_heap][right]))
       largest = right;
     
     console.log(left, right, largest);
