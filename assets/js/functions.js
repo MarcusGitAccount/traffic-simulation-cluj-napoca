@@ -15,6 +15,7 @@ import {
   randomInt
 } from './models/Utils.js';
 import {default as DirectedGraph} from './models/DirectedGraph.js';
+import {default as BinaryHeap} from './models/BinaryHeap.js';
 
 const canvas = document.querySelector('canvas');
 
@@ -30,7 +31,7 @@ const cars = [];
 
 (function init() {
   canvas.width = 1000;
-  canvas.height = 750;
+  canvas.height = 650;
   
   window.fetch(`${window.location.origin}/api/points`)
         .then(async function(response) {
@@ -57,9 +58,8 @@ const cars = [];
           colorIndex++;
           
           for (let index = 0; index < roads.length; index++)
-            console.log(index, roads[index].start, roads[index].end);
+            //console.log(index, roads[index].start, roads[index].end);
           
-
           return Promise.resolve(true);
         })
         .then(done => {
@@ -78,8 +78,6 @@ const cars = [];
             roads[index].addCar(cars[index]);
           
           roadSystem = new RoadSystem(roads);
-          
-          console.log(roadSystem)
           
           if (done === true)
             window.requestAnimFrame(animationStep);
@@ -107,7 +105,7 @@ function animationStep(timestamp) {
       car.draw(roads[index].slope);
       
       if (!testForPointInSegment(car.position, {start, end})) {
-        console.log(index, roadSystem.vertexEdgesNumber(index));
+        //console.log(index, roadSystem.vertexEdgesNumber(index));
         roadSystem.roadsArray[index].deleteCar(car);
         if (roadSystem.vertexEdgesNumber(index) > 0) {
           const newIndex = roadSystem.getRandomEdge(index);
@@ -122,18 +120,18 @@ function animationStep(timestamp) {
   window.requestAnimFrame(animationStep);
 }
 
-const graph = new DirectedGraph();
+const cmp = (a, b) => a < b;
+const heap = new BinaryHeap(cmp); // min heap
 
-graph.addVertices(1, 2, 3, 4, 5, 6, 7);
-graph.addEdge(5, 1);
-graph.addEdge(1, 2);
-graph.addEdge(1, 3);
-graph.addEdge(1, 5);
-graph.addEdge(3, 4);
-graph.addEdge(5, 3);
-graph.addEdge(2, 6);
-graph.addEdge(2, 5);
-graph.addEdge(6, 7);
-graph.addEdge(7 ,2);
-graph.removeEdge(5, 3);
-graph.removeVertex(1);
+Promise.resolve(true)
+  .then(async function(_) {
+    heap.push(3, 8, 9, 1, 6, 5); // 1 3 5 8 6 9
+    heap.debug();
+    console.log(heap.pop());
+
+    return Promise.resolve(true);
+  })
+  .then(_ => {
+    heap.debug();
+  })
+  .catch(error => console.log(error));

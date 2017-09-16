@@ -1,5 +1,7 @@
 'use strict';
 
+import {default as BinaryHeap} from './BinaryHeap.js';
+
 function point2D(x, y) {
   return {x, y};
 }
@@ -117,11 +119,27 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+function addHeapsortToPrototype() {
+  Array.prototype.heapsort = function(cmp) {
+    const heap = new BinaryHeap((parent, child) => parent < child);
+    const result = [];
+    
+    heap.insert(...this);
+    while (heap.size > 0) {
+      result.push(heap.pop());
+    }
+    
+    return result;
+  };
+}
+
+
 export {
   point2D, distanceBetween2DPoints,
   getRequestAnimationFrameFunction, 
   vector2D, angleBetween2DVectors, segmentToVector,
   degreesToRad, radToDegrees,
   segmentSlope, testForColiniarity, testForPointInSegment,
-  latLngToCanvasXY, randomInt
+  latLngToCanvasXY, randomInt,
+  addHeapsortToPrototype
 };
