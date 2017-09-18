@@ -107,7 +107,7 @@ function latLngToCanvasXY(coords, bounds, canvasDimensions) {
   // console.log(coords, bounds, canvasDimensions)
   
   return point2D(
-    Math.floor(((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) *  canvasDimensions.width),
+    Math.floor(((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * canvasDimensions.width),
     Math.floor(((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * canvasDimensions.height)
   );
 }
@@ -125,7 +125,7 @@ function addHeapsortToPrototype() {
     const result = [];
     
     heap.insert(...this);
-    while (heap.size > 0) {
+    while (!heap.empty) {
       result.push(heap.pop());
     }
     

@@ -8,10 +8,12 @@ const _createSystem = Symbol('_createSystem');
 class RoadSystem extends DirectedGraph {
   constructor(roadsArray) {
     super();
+    // this.points 
     this.roadsArray = roadsArray;
     
     for (let index = 0; index < this.roadsArray.length; index++)
       this.addVertices(index);
+    
     
     this[_createSystem]();
   }

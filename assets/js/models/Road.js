@@ -38,12 +38,13 @@ import {distanceBetween2DPoints} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
-const defaultDrawingOptions = {strokeColor: '##eee', lineWidth: 1};
+const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 1};
 
 class Road {
-  constructor(start, end, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {
+  constructor(start, end, coords, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {
     this.start = start; // x, y
     this.end = end;
+    this.coords = coords;
     this.distance = Math.floor(distanceBetween2DPoints(start, end));
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;

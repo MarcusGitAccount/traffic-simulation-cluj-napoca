@@ -32,7 +32,8 @@ const cars = [];
 (function init() {
   canvas.width = 1000;
   canvas.height = 650;
-  
+  window.globalContext.transform(1, 0, 0, -1, 0, canvas.height);
+
   window.fetch(`${window.location.origin}/api/points`)
         .then(async function(response) {
           return await response.json();
@@ -43,12 +44,21 @@ const cars = [];
             height: canvas.height
           };
           
-          let colorIndex = 0;
+          let colorIndex = 0, temp;
+          
+          // every canvas is drawn in the 4th square of the XoY system
+          // thus you have to invert the bottom and top oY(latitude in this case) bounds
+          // swap(bottom, top)
+          
+          temp = data.bounds.maxLat;
+          data.bounds.maxLat = data.bounds.minLat;
+          data.bounds.minLat = temp;
           
           for (const pair of data.pairs) {
             roads.push(new Road(
               latLngToCanvasXY(pair.start, data.bounds, dimensions),
               latLngToCanvasXY(pair.end, data.bounds, dimensions),
+              pair,
               {maxSpeed: 2},
               null
               //{strokeColor: colorsArray[colorIndex % colorsArray.length], lineWidth: 1}
@@ -74,11 +84,19 @@ const cars = [];
             ]
           );
           
+          roads[0].drawingOptions = {strokeColor: 'blue', lineWidth: 2};
+          roads[1].drawingOptions = {strokeColor: 'green', lineWidth: 2};
+          roads[roads.length - 1].drawingOptions = {strokeColor: 'red', lineWidth: 2};
+          
+          for (const index of [1, roads.length - 1])
+            console.log(roads[index].drawingOptions.strokeColor,
+                        roads[index].start, roads[index].end, roads[index].coords)
+          
           for (let index = 0; index < cars.length; index++)
             roads[index].addCar(cars[index]);
           
           roadSystem = new RoadSystem(roads);
-          console.log(roadSystem)
+          console.log(roadSystem);
           if (done === true)
             window.requestAnimFrame(animationStep);
         })
@@ -119,20 +137,3 @@ function animationStep(timestamp) {
   
   window.requestAnimFrame(animationStep);
 }
-
-const cmp = (a, b) => a < b;
-const heap = new BinaryHeap(cmp); // min heap
-
-Promise.resolve(true)
-  .then(async function(_) {
-    heap.push(3, 8, 9, 1, 6, 5); // 1 3 5 8 6 9
-    heap.debug();
-    console.log(heap.pop());
-
-    return Promise.resolve(true);
-  })
-  .then(_ => {
-    heap.debug();
-  })
-  .catch(error => console.log(error));
-  
