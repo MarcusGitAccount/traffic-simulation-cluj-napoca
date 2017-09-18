@@ -11,14 +11,14 @@
 const _adjacencyList = Symbol('_adjacencyList'); // Symbols for private properties
 const _dfs = Symbol('_dfs');
 
-(function updateSetPrototype() {
-  Set.prototype.getItemAtPosition = function(position) {
+(function updateMapPrototype() {
+  Map.prototype.getKeytPosition = function(position) {
     let index = 0;
 
     if (position >= this.size)
       return -1;
     
-    for (let item of this) {
+    for (let item of this.keys()) {
       if (index === position)
         return item;
       
@@ -47,66 +47,66 @@ class DirectedGraph {
   addVertices(...vertexIds) {
     // create new list
     for (const id of vertexIds) {
-      this[_adjacencyList][id] = new Set();
+      this[_adjacencyList][id] = new Map();
       this[_dfs].visited[id] = false;
     }
-  }
-  
+  } // works with Map()
+
   removeVertex(vertexId) {
     // remove edges that come to this vertex
     for (const vertex in this[_adjacencyList]) { 
       if (this[_adjacencyList][vertex].has(vertexId))
         this[_adjacencyList][vertex].delete(vertexId);
     }
-    
+   
     // remove edges that leave this vertex
     delete this[_adjacencyList][vertexId]; 
-  }
-  
+  } // works with Map()
+ 
   checkIfVertexExists(vertexId) {
     return this[_adjacencyList].hasOwnProperty(vertexId);
-  }
-  
+  } // works with Map()
+
   checkIfEdgeExists(firstVertex, secondVertex) {
     if (!this.checkIfVertexExists(firstVertex) || !this.checkIfVertexExists(secondVertex))
       return false;
       
     return this[_adjacencyList][firstVertex].has(secondVertex);
-  }
+  } // works with Map()
   
-  addEdge(firstVertex, secondVertex) {
+  addEdge(firstVertex, secondVertex, weight) {
     for (const vertex of [firstVertex, secondVertex])
       if (!this.checkIfVertexExists(vertex))
         this.addVertex(vertex);
     
-    this[_adjacencyList][firstVertex].add(secondVertex);
-  }
-  
+    this[_adjacencyList][firstVertex].set(secondVertex, weight);
+  } // works with Map()
+
   removeEdge(firstVertex, secondVertex) {
     if (this.checkIfVertexExists(firstVertex))
       if (this[_adjacencyList][firstVertex].has(secondVertex))
         this[_adjacencyList][firstVertex].delete(secondVertex);
-  }
-  
+  } // works with Map()
+
   vertexEdgesNumber(vertexId) {
     return this[_adjacencyList][vertexId].size;
-  }
+  } // works with Map()
   
   vertexEdges(vertexId) {
     return this[_adjacencyList][vertexId];
-  }
+  } // works with Map()
   
   get veritecesNumber() {
     return Object.keys(this[_adjacencyList]).length;
-  }
+  } // works with Map()
   
   get vertices() {
     return Object.keys(this[_adjacencyList]);
-  }
+  } // works with Map()
   
   get verticesList() {
     return this[_adjacencyList];
-  }
+  } // works with Map()
   
   dfs(start) {
     this[_dfs].result = [];

@@ -65,82 +65,16 @@ const centerSquarePoints = [
   }
 ];
 
+let arrayKeys = {};
+let pointsArray = [];
+let index = 0;
+
 module.exports = (router) => {
   router.get('/', (request, response) => {
     response.status(200).send("Root route for this application's api");
   });
   
   router.get('/points', (request, response) => {
-  /*    Promise.all(centerSquarePoints.map(async function(pair) {
-      return await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${pair.start.lat},${pair.start.lng}&destination=${pair.end.lat},${pair.end.lng}`);
-    }))
-      .then(async function(responses) {
-        return Promise.all(
-          responses.map(async function(res) {
-            return await res.json();
-          })
-        );
-      })
-      .then(async function(data) {
-        const points = [];
-        const bounds = { 
-          northeast: { lat: -999, lng: -999},
-          southwest: { lat: 999, lng: 999 } 
-        };
-        
-        console.log(data[0].routes[0].legs[0])
-        
-        data.forEach(item => {
-          const bound = item.routes[0].bounds;
-
-          if (bound.northeast.lat > bounds.northeast.lat)
-            bounds.northeast.lat = bound.northeast.lat;
-          if (bound.northeast.lng > bounds.northeast.lng)
-            bounds.northeast.lng = bound.northeast.lng;
-          
-          if (bound.southwest.lat < bounds.southwest.lat)
-            bounds.southwest.lat = bound.southwest.lat;
-          if (bound.southwest.lng < bounds.southwest.lng)
-            bounds.southwest.lng = bound.southwest.lng;  
-        });
-        
-        data.forEach(item => {
-          points.push(item.routes[0].legs[0].steps.map(step => {
-            return {
-              start: {
-                wgs84: step.start_location,
-                utm: getUtm(step.start_location)
-              },
-              end: {
-                wgs84: step.end_location,
-                utm: getUtm(step.end_location)
-              },
-              distance: step.distance.value
-            };
-          }));
-        });
-        
-        const _bounds = {
-          northeast: {
-            wgs84: bounds.northeast,
-            utm: getUtm(bounds.northeast)
-          },
-          southwest: {
-            wgs84: bounds.southwest,
-            utm: getUtm(bounds.southwest)
-          }
-        };
-        
-        return Promise.resolve({points, bounds, _bounds});
-      })
-      .then(dataSet => {
-        const {points, _bounds} = dataSet;
-        
-        response.status(200).json({points, _bounds, totalDistance});
-      })
-      .catch(error => {
-        response.status(204).send(new Error(error));
-      });*/
     const bounds = {
       minLat:  999,
       maxLat: -999,
@@ -162,7 +96,32 @@ module.exports = (router) => {
       }
     }
     
-    response.status(200).json({pairs: centerSquarePoints, bounds: bounds});
+    centerSquarePoints.forEach(pair => {
+    	for (const p in pair) {
+    		const prop = `${pair[p].lat},${pair[p].lng}`;
+    
+    		if (!arrayKeys.hasOwnProperty(prop)) {
+    			arrayKeys[prop] = {
+    			  index: index++,
+    			  point: pair[p]
+    			};
+    		}
+    	}
+    });
+    
+    for (let i = 0; i < centerSquarePoints.length; i++) {
+      for (const p of ['start', 'end']) {
+        const prop = `${centerSquarePoints[i][p].lat},${centerSquarePoints[i][p].lng}`;
+        
+        centerSquarePoints[i][p] = arrayKeys[prop];
+      }
+    }
+    
+    for (const prop in arrayKeys) {
+      pointsArray[arrayKeys[prop].index] = arrayKeys[prop].point;
+    }
+    
+    response.status(200).json({pairs: centerSquarePoints, bounds: bounds, points: pointsArray});
   });
 
   return router;

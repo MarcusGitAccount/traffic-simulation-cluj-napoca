@@ -32,7 +32,6 @@ const cars = [];
 (function init() {
   canvas.width = 1000;
   canvas.height = 650;
-  window.globalContext.transform(1, 0, 0, -1, 0, canvas.height);
 
   window.fetch(`${window.location.origin}/api/points`)
         .then(async function(response) {
@@ -44,8 +43,8 @@ const cars = [];
             height: canvas.height
           };
           
-          let colorIndex = 0, temp;
-          
+          let temp;
+
           // every canvas is drawn in the 4th square of the XoY system
           // thus you have to invert the bottom and top oY(latitude in this case) bounds
           // swap(bottom, top)
@@ -53,26 +52,23 @@ const cars = [];
           temp = data.bounds.maxLat;
           data.bounds.maxLat = data.bounds.minLat;
           data.bounds.minLat = temp;
-          
+
+          roadSystem = new RoadSystem(data.points);
+          roadSystem.addVertices(...Object.keys(data.points));
+
           for (const pair of data.pairs) {
-            roads.push(new Road(
-              latLngToCanvasXY(pair.start, data.bounds, dimensions),
-              latLngToCanvasXY(pair.end, data.bounds, dimensions),
+            const roadPiece = new Road(
+              latLngToCanvasXY(pair.start.point, data.bounds, dimensions),
+              latLngToCanvasXY(pair.end.point, data.bounds, dimensions),
               pair,
               {maxSpeed: 2},
               null
-              //{strokeColor: colorsArray[colorIndex % colorsArray.length], lineWidth: 1}
-            ));
-            
+            );
+
+            roadSystem.addEdge(pair.start.index, pair.end.index, roadPiece);
+            roads.push(roadPiece);
           }
-          colorIndex++;
-          
-          for (let index = 0; index < roads.length; index++)
-            //console.log(index, roads[index].start, roads[index].end);
-          
-          return Promise.resolve(true);
-        })
-        .then(done => {
+
           cars.push(
             ...[
               new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
@@ -83,26 +79,23 @@ const cars = [];
               new Car(6, roads[5].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 })
             ]
           );
-          
+
+          for (let index = 0; index < cars.length; index++)
+            roads[index].addCar(cars[index]);
+
           roads[0].drawingOptions = {strokeColor: 'blue', lineWidth: 2};
           roads[1].drawingOptions = {strokeColor: 'green', lineWidth: 2};
           roads[roads.length - 1].drawingOptions = {strokeColor: 'red', lineWidth: 2};
-          
-          for (const index of [1, roads.length - 1])
-            console.log(roads[index].drawingOptions.strokeColor,
-                        roads[index].start, roads[index].end, roads[index].coords)
-          
-          for (let index = 0; index < cars.length; index++)
-            roads[index].addCar(cars[index]);
-          
-          roadSystem = new RoadSystem(roads);
-          console.log(roadSystem);
+
+          return Promise.resolve(true);
+        })
+        .then(done => {
           if (done === true)
             window.requestAnimFrame(animationStep);
         })
         .catch(error => {
           console.log(error);
-          
+
           throw error;
         });
   
@@ -119,9 +112,9 @@ function animationStep(timestamp) {
     
     for (const car of roads[index].cars) {
       const {start, end} = roads[index];
-      
+
       car.draw(roads[index].slope);
-      
+
       if (!testForPointInSegment(car.position, {start, end})) {
         //console.log(index, roadSystem.vertexEdgesNumber(index));
         roadSystem.roadsArray[index].deleteCar(car);
