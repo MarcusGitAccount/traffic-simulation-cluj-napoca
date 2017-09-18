@@ -44,7 +44,7 @@ class Road {
   constructor(start, end, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {
     this.start = start; // x, y
     this.end = end;
-    this.distance = distanceBetween2DPoints(start, end);
+    this.distance = Math.floor(distanceBetween2DPoints(start, end));
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
     this.cars = [];

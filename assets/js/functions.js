@@ -78,7 +78,7 @@ const cars = [];
             roads[index].addCar(cars[index]);
           
           roadSystem = new RoadSystem(roads);
-          
+          console.log(roadSystem)
           if (done === true)
             window.requestAnimFrame(animationStep);
         })
@@ -135,3 +135,4 @@ Promise.resolve(true)
     heap.debug();
   })
   .catch(error => console.log(error));
+  
