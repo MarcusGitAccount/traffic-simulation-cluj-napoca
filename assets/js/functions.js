@@ -90,8 +90,15 @@ const cars = [];
           return Promise.resolve(true);
         })
         .then(done => {
-          if (done === true)
+          if (done === true) {
+            // bit of debugging
+            console.log(roadSystem.verticesList);
+            console.log('bfs: ', ...roadSystem.bfs(0));
+            console.log(roadSystem.vertexEdges(1));
+            console.log(roadSystem);
+            
             window.requestAnimFrame(animationStep);
+          }
         })
         .catch(error => {
           console.log(error);
@@ -102,31 +109,13 @@ const cars = [];
 })();
 
 function animationStep(timestamp) {
+  // find a better way to reset the canvas
+  // this seems to works for Chrome, not sure for other browsers
+
   canvas.width = canvas.width;
-  
-  for (const road of roadSystem.roadsArray)
-    road.draw();
-  
-  for (let index = 0; index < roadSystem.roadsArray.length; index++) {
-    roads[index].adaptSpeed();
-    
-    for (const car of roads[index].cars) {
-      const {start, end} = roads[index];
 
-      car.draw(roads[index].slope);
+  roadSystem.drawRoads();
+  roadSystem.updateCars();
 
-      if (!testForPointInSegment(car.position, {start, end})) {
-        //console.log(index, roadSystem.vertexEdgesNumber(index));
-        roadSystem.roadsArray[index].deleteCar(car);
-        if (roadSystem.vertexEdgesNumber(index) > 0) {
-          const newIndex = roadSystem.getRandomEdge(index);
-
-          car.position = roadSystem.roadsArray[newIndex].start;
-          roadSystem.roadsArray[newIndex].addCar(car);
-        }
-      }
-    }
-  }
-  
   window.requestAnimFrame(animationStep);
 }

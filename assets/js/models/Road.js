@@ -50,7 +50,7 @@ class Road {
     this.angleForCar = null;
     this.cars = [];
     this.drivingOptions = drivingOptions;
-    this[_slope] = null;
+    this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);;
   }
   
   addCar(car) {
@@ -97,9 +97,6 @@ class Road {
   }
   
   get slope() {
-    if (!this[_slope])
-      this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
-      
     return this[_slope];
   }
 }

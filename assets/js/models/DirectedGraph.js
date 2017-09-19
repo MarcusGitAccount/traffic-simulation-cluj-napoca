@@ -108,6 +108,10 @@ class DirectedGraph {
     return this[_adjacencyList];
   } // works with Map()
   
+  getEdge(start, end) {
+    return this[_adjacencyList][start].get(end);
+  }
+  
   dfs(start) {
     this[_dfs].result = [];
     this[_dfs].visited = this[_dfs].visited.map(_ => false);
@@ -129,7 +133,7 @@ class DirectedGraph {
       const top = queue.shift();
       
       result.push(top);
-      for (const neighbour of this[_adjacencyList][top]) {
+      for (const neighbour of this[_adjacencyList][top].keys()) {
         if (visited[neighbour] === false) {
           queue.push(neighbour);
           visited[neighbour] = true;
@@ -138,7 +142,7 @@ class DirectedGraph {
     }
     
     return result;
-  }
+  } // works with Map()
 }
 
 export default DirectedGraph;
