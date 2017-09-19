@@ -10,9 +10,7 @@ import {default as Road} from './models/Road.js';
 import {default as RoadSystem} from './models/RoadSystem.js';
 import {
   getRequestAnimationFrameFunction as getRequestAnimFrame, 
-  testForPointInSegment,
-  latLngToCanvasXY, degreesToRad,
-  randomInt
+  latLngToCanvasXY,
 } from './models/Utils.js';
 import {default as DirectedGraph} from './models/DirectedGraph.js';
 import {default as BinaryHeap} from './models/BinaryHeap.js';
@@ -37,12 +35,7 @@ const cars = [];
         .then(async function(response) {
           return await response.json();
         })
-        .then(data => {
-          const dimensions = {
-            width: canvas.width,
-            height: canvas.height
-          };
-          
+        .then(async function(data) {
           let temp;
 
           // every canvas is drawn in the 4th square of the XoY system
@@ -56,47 +49,58 @@ const cars = [];
           roadSystem = new RoadSystem(data.points);
           roadSystem.addVertices(...Object.keys(data.points));
 
-          for (const pair of data.pairs) {
-            const roadPiece = new Road(
-              latLngToCanvasXY(pair.start.point, data.bounds, dimensions),
-              latLngToCanvasXY(pair.end.point, data.bounds, dimensions),
-              pair,
-              {maxSpeed: 2},
-              null
+          return Promise.resolve({done: true, data: data});
+        })
+        .then(async function(response) {
+          const dimensions = {
+            width: canvas.width,
+            height: canvas.height
+          };
+          const {done, data} = response;
+          
+          if (done) {
+            for (const pair of data.pairs) {
+              const roadPiece = new Road(
+                latLngToCanvasXY(pair.start.point, data.bounds, dimensions),
+                latLngToCanvasXY(pair.end.point, data.bounds, dimensions),
+                pair,
+                {maxSpeed: 1},
+                null
+              );
+  
+              roadSystem.addEdge(pair.start.index, pair.end.index, roadPiece);
+              roads.push(roadPiece);
+            }
+            
+            console.log(roadSystem, data.pairs);
+            return Promise.resolve(true);
+          }
+          
+        })
+        .then(async function(done) {
+          if (done === true) {
+            cars.push(
+              ...[
+                new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
+                new Car(2, roads[1].start, 10, 7.5, null,  .5, {maxSpeed: 1   }),
+                new Car(3, roads[2].start, 10, 7.5, null, .75, {maxSpeed: 1.75}),
+                new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
+                new Car(5, roads[4].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
+                new Car(6, roads[5].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
+                new Car(7, roads[6].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
+                new Car(8, roads[7].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
+                new Car(9, roads[8].start, 10, 7.5, null, 3.5, {maxSpeed: 1 })
+              ]
             );
 
-            roadSystem.addEdge(pair.start.index, pair.end.index, roadPiece);
-            roads.push(roadPiece);
-          }
-
-          cars.push(
-            ...[
-              new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
-              new Car(2, roads[1].start, 10, 7.5, null,  .5, {maxSpeed: 1   }),
-              new Car(3, roads[2].start, 10, 7.5, null, .75, {maxSpeed: 1.75}),
-              new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
-              new Car(5, roads[4].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
-              new Car(6, roads[5].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 })
-            ]
-          );
-
-          for (let index = 0; index < cars.length; index++)
-            roads[index].addCar(cars[index]);
-
-          roads[0].drawingOptions = {strokeColor: 'blue', lineWidth: 2};
-          roads[1].drawingOptions = {strokeColor: 'green', lineWidth: 2};
-          roads[roads.length - 1].drawingOptions = {strokeColor: 'red', lineWidth: 2};
-
-          return Promise.resolve(true);
-        })
-        .then(done => {
-          if (done === true) {
-            // bit of debugging
-            console.log(roadSystem.verticesList);
-            console.log('bfs: ', ...roadSystem.bfs(0));
-            console.log(roadSystem.vertexEdges(1));
-            console.log(roadSystem);
+            for (let index = 0; index < cars.length; index++)
+              roads[index].addCar(cars[index]);
+  
+            roads[0].drawingOptions = {strokeColor: 'blue', lineWidth: 2};
+            roads[1].drawingOptions = {strokeColor: 'green', lineWidth: 2};
+            roads[roads.length - 1].drawingOptions = {strokeColor: 'red', lineWidth: 2};
             
+            console.log(roadSystem)
             window.requestAnimFrame(animationStep);
           }
         })
@@ -110,7 +114,7 @@ const cars = [];
 
 function animationStep(timestamp) {
   // find a better way to reset the canvas
-  // this seems to works for Chrome, not sure for other browsers
+  // this seems to work for Chrome, not sure for other browsers
 
   canvas.width = canvas.width;
 

@@ -50,7 +50,7 @@ class DirectedGraph {
       this[_adjacencyList][id] = new Map();
       this[_dfs].visited[id] = false;
     }
-  } // works with Map()
+  } 
 
   removeVertex(vertexId) {
     // remove edges that come to this vertex
@@ -61,18 +61,18 @@ class DirectedGraph {
    
     // remove edges that leave this vertex
     delete this[_adjacencyList][vertexId]; 
-  } // works with Map()
+  } 
  
   checkIfVertexExists(vertexId) {
     return this[_adjacencyList].hasOwnProperty(vertexId);
-  } // works with Map()
+  } 
 
   checkIfEdgeExists(firstVertex, secondVertex) {
     if (!this.checkIfVertexExists(firstVertex) || !this.checkIfVertexExists(secondVertex))
       return false;
       
     return this[_adjacencyList][firstVertex].has(secondVertex);
-  } // works with Map()
+  } 
   
   addEdge(firstVertex, secondVertex, weight) {
     for (const vertex of [firstVertex, secondVertex])
@@ -80,33 +80,33 @@ class DirectedGraph {
         this.addVertex(vertex);
     
     this[_adjacencyList][firstVertex].set(secondVertex, weight);
-  } // works with Map()
+  } 
 
   removeEdge(firstVertex, secondVertex) {
     if (this.checkIfVertexExists(firstVertex))
       if (this[_adjacencyList][firstVertex].has(secondVertex))
         this[_adjacencyList][firstVertex].delete(secondVertex);
-  } // works with Map()
+  } 
 
   vertexEdgesNumber(vertexId) {
     return this[_adjacencyList][vertexId].size;
-  } // works with Map()
+  } 
   
   vertexEdges(vertexId) {
     return this[_adjacencyList][vertexId];
-  } // works with Map()
+  } 
   
   get veritecesNumber() {
     return Object.keys(this[_adjacencyList]).length;
-  } // works with Map()
+  } 
   
   get vertices() {
     return Object.keys(this[_adjacencyList]);
-  } // works with Map()
+  } 
   
   get verticesList() {
     return this[_adjacencyList];
-  } // works with Map()
+  } 
   
   getEdge(start, end) {
     return this[_adjacencyList][start].get(end);
@@ -142,7 +142,7 @@ class DirectedGraph {
     }
     
     return result;
-  } // works with Map()
+  } 
 }
 
 export default DirectedGraph;
