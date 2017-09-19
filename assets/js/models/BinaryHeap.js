@@ -86,10 +86,7 @@ class BinaryHeap {
       largest = left;
     if (right < this.size && !this.cmpFunction(this[_heap][largest], this[_heap][right]))
       largest = right;
-    
-    console.log(left, right, largest);
-    this.debug();
-    
+
     if (largest !== index) {
       const temp = this[_heap][index];
       
@@ -109,7 +106,7 @@ class BinaryHeap {
   }
   
   get empty() {
-    return this.size > 0;
+    return this.size === 0;
   }
 }
 

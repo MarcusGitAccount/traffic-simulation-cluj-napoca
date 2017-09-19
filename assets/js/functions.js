@@ -1,6 +1,5 @@
 /*
-  Make code:
- (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
+  Make code: (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
 */
 
 'use strict';
@@ -67,40 +66,47 @@ const cars = [];
                 {maxSpeed: 1},
                 null
               );
-  
+              
+              console.log(`edge: ${pair.start.index} -> ${pair.end.index} cost: ${roadPiece.distance}`);
               roadSystem.addEdge(pair.start.index, pair.end.index, roadPiece);
               roads.push(roadPiece);
             }
             
-            console.log(roadSystem, data.pairs);
             return Promise.resolve(true);
           }
-          
         })
         .then(async function(done) {
           if (done === true) {
+            const costs = roadSystem.dijkastra(7, (road) => road.distance);
+            
             cars.push(
               ...[
                 new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
                 new Car(2, roads[1].start, 10, 7.5, null,  .5, {maxSpeed: 1   }),
                 new Car(3, roads[2].start, 10, 7.5, null, .75, {maxSpeed: 1.75}),
-                new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
-                new Car(5, roads[4].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
-                new Car(6, roads[5].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
-                new Car(7, roads[6].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
-                new Car(8, roads[7].start, 10, 7.5, null, 3.5, {maxSpeed: 4.5 }),
+                new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
+                new Car(5, roads[4].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
+                new Car(6, roads[5].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
+                new Car(7, roads[6].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
+                new Car(8, roads[7].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
                 new Car(9, roads[8].start, 10, 7.5, null, 3.5, {maxSpeed: 1 })
               ]
             );
 
             for (let index = 0; index < cars.length; index++)
               roads[index].addCar(cars[index]);
-  
-            roads[0].drawingOptions = {strokeColor: 'blue', lineWidth: 2};
-            roads[1].drawingOptions = {strokeColor: 'green', lineWidth: 2};
-            roads[roads.length - 1].drawingOptions = {strokeColor: 'red', lineWidth: 2};
+
+            console.log(roadSystem);
             
-            console.log(roadSystem)
+            
+            costs.distances.forEach((cost ,index) => {
+              console.log(`Optimal cost to get from node 7 to ${index}: ${cost}`);
+            });
+            console.log('');
+            costs.previousNodes.forEach((node, index) => {
+              console.log(`Previous node: ${node} -> ${index}`);
+            });
+            
             window.requestAnimFrame(animationStep);
           }
         })

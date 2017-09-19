@@ -129,7 +129,7 @@ module.exports = (router) => {
         response.setHeader('Cache-Control', 'no-cache');
         response.status(200).json({pairs: data.centerSquarePoints, bounds: data.bounds, points: data.pointsArray});
       })
-      .catch(error => console.log(error))
+      .catch(error => console.log(error));
   });
 
   return router;

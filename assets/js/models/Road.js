@@ -34,11 +34,11 @@
 */
 'use strict';
 
-import {distanceBetween2DPoints} from './Utils.js';
+import {distanceBetween2DPoints, point2D} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
-const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 1};
+const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 3};
 
 class Road {
   constructor(start, end, coords, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {
@@ -50,7 +50,7 @@ class Road {
     this.angleForCar = null;
     this.cars = [];
     this.drivingOptions = drivingOptions;
-    this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);;
+    this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
   }
   
   addCar(car) {
@@ -70,6 +70,27 @@ class Road {
     window.globalContext.lineWidth = this.drawingOptions.lineWidth;
     window.globalContext.moveTo(this.start.x, this.start.y);
     window.globalContext.lineTo(this.end.x, this.end.y);
+    window.globalContext.stroke();
+    
+    // this.drawParallelLine(10);
+  }
+  
+  drawParallelLine(distance) {
+    const parallelSlope = -Math.pow(this.slope, -1);
+    const update = (point, slope) => {
+      return point2D(
+        point.x + distance * Math.cos(slope),
+        point.y + distance * Math.sin(slope)
+      );
+    };
+    const start = update(this.start, parallelSlope);
+    const end   = update(this.end, parallelSlope);
+    
+    window.globalContext.beginPath();
+    window.globalContext.strokeStyle = '#FF0080';
+    window.globalContext.lineWidth = 1;
+    window.globalContext.moveTo(start.x, start.y);
+    window.globalContext.lineTo(end.x, end.y);
     window.globalContext.stroke();
   }
   

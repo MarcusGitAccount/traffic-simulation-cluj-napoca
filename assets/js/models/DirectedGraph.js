@@ -6,7 +6,10 @@
   How to make code: (∩°-°)⊃━☆ﾟ.*･｡ﾟ 
 
   vertices =  nodes
+  edges = node paths
 */
+
+import {default as PriorityQueue} from './BinaryHeap.js';
 
 const _adjacencyList = Symbol('_adjacencyList'); // Symbols for private properties
 const _dfs = Symbol('_dfs');
@@ -142,7 +145,45 @@ class DirectedGraph {
     }
     
     return result;
-  } 
+  }
+  
+  dijkastra(startingVertex, weightFunction) {
+    /*
+      Weight function example for the RoadSystem class:
+      (road) => {
+        return road.distance;
+      }
+    */
+    
+    const INF = Math.pow(2, 31) - 1;
+    const queue = new PriorityQueue((parent, child) => parent.weight < child.weight);
+    const size = this.veritecesNumber;
+    const distances = [...new Array(size + 1)].fill(INF);
+    const previousNodes = [...new Array(size + 1)].fill(null);
+
+    distances[startingVertex] = 0;
+    queue.push({vertex: startingVertex, weight: 0});
+    
+    while (!queue.empty) {
+      const front = queue.pop();
+
+      this.vertexEdges(front.vertex).forEach((weight, vertex) => {
+        // edge between front.vertex -> vertex
+        // weightFunction(weight) = cost to traverse this vertex
+        // front weight = current calculated weight necesary to get to this node
+
+        const distanceUpdate = front.weight + weightFunction(weight);
+
+        if (distanceUpdate < distances[vertex]) {
+          distances[vertex] = distanceUpdate;
+          previousNodes[vertex] = front.vertex;
+          queue.push({vertex: vertex, weight: distanceUpdate});
+        }
+      });
+    }
+    
+    return {distances, previousNodes};
+  }
 }
 
 export default DirectedGraph;

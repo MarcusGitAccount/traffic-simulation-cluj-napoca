@@ -1,3 +1,8 @@
+/*
+  Make code: (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
+*/
+
+
 'use strict';
 
 import {default as DirectedGraph} from './DirectedGraph.js';
