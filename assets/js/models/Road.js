@@ -34,29 +34,36 @@
 */
 'use strict';
 
-import {distanceBetween2DPoints, point2D} from './Utils.js';
+import {distanceBetween2DPoints, point2D, getLanesDividers} from './Utils.js';
 
 const _slope = Symbol('_slope');
 
-const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 3};
+const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 4};
+const defaultLanesInfo = {numberOfLanes: 1, size: 4};
 
 class Road {
-  constructor(start, end, coords, drivingOptions, lane, drawingOptions = defaultDrawingOptions) {
+  constructor(start, end, coords, drivingOptions, lanesInfo = defaultLanesInfo, drawingOptions = defaultDrawingOptions) {
     this.start = start; // x, y
     this.end = end;
     this.coords = coords;
     this.distance = Math.floor(distanceBetween2DPoints(start, end));
+    this.lanesInfo = lanesInfo; /*
+      Example: this.lanesInfo: {
+        numberOfLanes: 4,
+        size: 5
+      }
+    */
+    this.lanesInfo['dividers'] = getLanesDividers(this.lanesInfo.size);
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
-    this.cars = [];
+    this.cars = []; //[...new Array(this.lanesInfo)];
     this.drivingOptions = drivingOptions;
     this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
   }
   
-  addCar(car) {
+  addCar(car, lane) {
     if (this.drivingOptions && this.drivingOptions.speedLimit < car.velocity)
       car.velocity = this.drivingOptions.speedLimit;
-    
     this.cars.push(car);
   }
   
@@ -67,7 +74,7 @@ class Road {
   draw() {
     window.globalContext.beginPath();
     window.globalContext.strokeStyle = this.drawingOptions.strokeColor;
-    window.globalContext.lineWidth = this.drawingOptions.lineWidth;
+    window.globalContext.lineWidth = this.drawingOptions.lineWidth * this.lanesInfo.numberOfLanes;
     window.globalContext.moveTo(this.start.x, this.start.y);
     window.globalContext.lineTo(this.end.x, this.end.y);
     window.globalContext.stroke();

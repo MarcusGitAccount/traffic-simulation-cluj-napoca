@@ -133,6 +133,18 @@ function addHeapsortToPrototype() {
   };
 }
 
+function getLanesDividers(size) {
+  let difference = Math.floor(size / 2);
+  const result = [];
+
+  if (size % 2 === 0)
+    difference -= .5;
+
+  for (let index = 0; index < size; index++)
+    result.push(index - difference);
+    
+  return result;
+}
 
 export {
   point2D, distanceBetween2DPoints,
@@ -141,5 +153,6 @@ export {
   degreesToRad, radToDegrees,
   segmentSlope, testForColiniarity, testForPointInSegment,
   latLngToCanvasXY, randomInt,
-  addHeapsortToPrototype
+  addHeapsortToPrototype,
+  getLanesDividers
 };

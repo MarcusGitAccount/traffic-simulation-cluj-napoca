@@ -1,7 +1,7 @@
 'use strict';
 
 /*defining symbols for private variables*/
-import {point2D} from './Utils.js';
+import {point2D, randomInt} from './Utils.js';
 
 const _road = Symbol('_road');
 const _velocity = Symbol('_velocity');
@@ -21,20 +21,23 @@ class Car {
     this.drawingOptions = drawingOptions;
   }
 
-
   updatePosition(angle) {
-    const {x, y} = this.position;
-    
-    this.position = {
-      x: x + Math.cos(angle) * this.velocity,
-      y: y + Math.sin(angle) * this.velocity
-    };
+    this.position = point2D(
+      this.position.x + Math.cos(angle) * this.velocity,
+      this.position.y + Math.sin(angle) * this.velocity
+    );
   }
 
-  draw(angle) {
+  draw(angle, roadLanesInfo) {
+    const laneSlope = -Math.pow(angle, -1);
+    
     this.updatePosition(angle);
 
-    const {x, y} = this.position;
+    const {x, y} = point2D(
+      this.position.x + Math.cos(laneSlope) * roadLanesInfo.size * roadLanesInfo.dividers[this.lane],
+      this.position.y + Math.sin(laneSlope) * roadLanesInfo.size * roadLanesInfo.dividers[this.lane]
+    );
+
     const end = point2D(
       x + this.length * Math.cos(angle),
       y + this.width * Math.sin(angle)

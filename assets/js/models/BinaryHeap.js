@@ -62,7 +62,6 @@ class BinaryHeap {
       
       index = parent;
     }
-    
   }
   
   pop() {

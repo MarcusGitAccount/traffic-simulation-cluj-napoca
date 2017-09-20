@@ -158,9 +158,10 @@ class DirectedGraph {
     const INF = Math.pow(2, 31) - 1;
     const queue = new PriorityQueue((parent, child) => parent.weight < child.weight);
     const size = this.veritecesNumber;
-    const distances = [...new Array(size + 1)].fill(INF);
-    const previousNodes = [...new Array(size + 1)].fill(null);
+    const distances = [...new Array(size)].fill(INF);
+    const previousNodes = [...new Array(size)].fill(null);
 
+    previousNodes[startingVertex] = startingVertex;
     distances[startingVertex] = 0;
     queue.push({vertex: startingVertex, weight: 0});
     

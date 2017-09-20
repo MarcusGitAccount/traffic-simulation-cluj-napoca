@@ -2,7 +2,6 @@
   Make code: (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
 */
 
-
 'use strict';
 
 import {default as DirectedGraph} from './DirectedGraph.js';
@@ -33,7 +32,7 @@ class RoadSystem extends DirectedGraph {
  
         road.adaptSpeed();
         for (const car of road.cars) {
-          car.draw(road.slope);
+          car.draw(road.slope, road.lanesInfo);
 
           if (!testForPointInSegment(car.position, {start, end})) {
             road.deleteCar(car);

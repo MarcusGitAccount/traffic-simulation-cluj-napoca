@@ -11,8 +11,6 @@ import {
   getRequestAnimationFrameFunction as getRequestAnimFrame, 
   latLngToCanvasXY,
 } from './models/Utils.js';
-import {default as DirectedGraph} from './models/DirectedGraph.js';
-import {default as BinaryHeap} from './models/BinaryHeap.js';
 
 const canvas = document.querySelector('canvas');
 
@@ -27,7 +25,7 @@ const colorsArray = ['#E65100', '#607D8B', 'red', 'cyan', 'pink', '#1B5E20', '#1
 const cars = [];
 
 (function init() {
-  canvas.width = 1000;
+  canvas.width  = 1000;
   canvas.height = 650;
 
   window.fetch(`${window.location.origin}/api/points`)
@@ -64,7 +62,7 @@ const cars = [];
                 latLngToCanvasXY(pair.end.point, data.bounds, dimensions),
                 pair,
                 {maxSpeed: 1},
-                null
+                {numberOfLanes: 4, size: 4}
               );
               
               console.log(`edge: ${pair.start.index} -> ${pair.end.index} cost: ${roadPiece.distance}`);
@@ -81,23 +79,22 @@ const cars = [];
             
             cars.push(
               ...[
-                new Car(1, roads[0].start, 10, 7.5, null, 1.5, {maxSpeed: 2   }),
-                new Car(2, roads[1].start, 10, 7.5, null,  .5, {maxSpeed: 1   }),
-                new Car(3, roads[2].start, 10, 7.5, null, .75, {maxSpeed: 1.75}),
-                new Car(4, roads[3].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
-                new Car(5, roads[4].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
-                new Car(6, roads[5].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
-                new Car(7, roads[6].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
-                new Car(8, roads[7].start, 10, 7.5, null, 3.5, {maxSpeed: 1.5 }),
-                new Car(9, roads[8].start, 10, 7.5, null, 3.5, {maxSpeed: 1 })
+                new Car(1, roads[0].start, 10, 7.5, 2, 3, {maxSpeed: 2   }),
+                new Car(2, roads[1].start, 10, 7.5, 2, 3, {maxSpeed: 1   }),
+                new Car(3, roads[2].start, 10, 7.5, 2, 3, {maxSpeed: 1.75}),
+                new Car(4, roads[3].start, 10, 7.5, 2, 3, {maxSpeed: 1.5 }),
+                new Car(5, roads[4].start, 10, 7.5, 2, 3, {maxSpeed: 1.5 }),
+                new Car(6, roads[5].start, 10, 7.5, 2, 3, {maxSpeed: 1.5 }),
+                new Car(7, roads[6].start, 10, 7.5, 2, 3, {maxSpeed: 1.5 }),
+                new Car(8, roads[7].start, 10, 7.5, 2, 3, {maxSpeed: 1.5 }),
+                new Car(9, roads[8].start, 10, 7.5, 2, 3, {maxSpeed: 1 })
               ]
             );
 
             for (let index = 0; index < cars.length; index++)
               roads[index].addCar(cars[index]);
 
-            console.log(roadSystem);
-            
+            console.log('\n', roadSystem, '\n');
             
             costs.distances.forEach((cost ,index) => {
               console.log(`Optimal cost to get from node 7 to ${index}: ${cost}`);
