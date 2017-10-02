@@ -45,6 +45,7 @@ class Road {
   constructor(start, end, coords, drivingOptions, lanesInfo = defaultLanesInfo, drawingOptions = defaultDrawingOptions) {
     this.start = start; // x, y
     this.end = end;
+    this.drawingPoints = {start, end};
     this.coords = coords;
     this.distance = Math.floor(distanceBetween2DPoints(start, end));
     this.lanesInfo = lanesInfo; /*
@@ -53,7 +54,9 @@ class Road {
         size: 5
       }
     */
-    this.lanesInfo['dividers'] = getLanesDividers(this.lanesInfo.size);
+    this.lanesInfo['startingPoints'] = [];
+    this.lanesInfo['endingPoints'] = []; 
+    this.lanesInfo['dividers'] = [-4, -2, 2, 4];// getLanesDividers(this.lanesInfo.numberOfLanes);
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
     this.cars = []; //[...new Array(this.lanesInfo)];
@@ -70,16 +73,27 @@ class Road {
   deleteCar(car) {
     this.cars.splice(this.cars.indexOf(car), 1);
   }
-  
+
   draw() {
     window.globalContext.beginPath();
     window.globalContext.strokeStyle = this.drawingOptions.strokeColor;
-    window.globalContext.lineWidth = this.drawingOptions.lineWidth * this.lanesInfo.numberOfLanes;
-    window.globalContext.moveTo(this.start.x, this.start.y);
-    window.globalContext.lineTo(this.end.x, this.end.y);
+    window.globalContext.lineWidth = 1;//this.lanesInfo.size * this.lanesInfo.numberOfLanes;
+    window.globalContext.moveTo(this.drawingPoints .start.x, this.drawingPoints.start.y);
+    window.globalContext.lineTo(this.drawingPoints .end.x, this.drawingPoints.end.y);
     window.globalContext.stroke();
-    
+
+    window.globalContext.beginPath();
+    window.globalContext.strokeStyle = 'pink';
+    window.globalContext.lineWidth = 1;
+    window.globalContext.moveTo(this.drawingPoints.start.x, this.drawingPoints.start.y);
+    window.globalContext.lineTo(this.drawingPoints.end.x, this.drawingPoints.end.y);
+    window.globalContext.stroke();
+
     // this.drawParallelLine(10);
+    
+/*  for (const divider of this.lanesInfo.dividers) {
+      this.drawParallelLine(this.lanesInfo.size * divider); 
+    }*/
   }
   
   drawParallelLine(distance) {

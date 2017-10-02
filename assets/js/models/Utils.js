@@ -20,7 +20,9 @@ function vector2D(i, j) {
   return newObject;
 }
 
-function segmentToVector(start, end) {
+function segmentToVector(segment) {
+  const {start, end} = segment
+  
   return vector2D(end.x - start.x, end.y - start.y);
 }
 
@@ -146,6 +148,23 @@ function getLanesDividers(size) {
   return result;
 }
 
+function getLanesDividersImproved(size, width) {
+  let difference = Math.floor(size / 2);
+  const result = [];
+
+  if (size % 2 === 0)
+    difference -= .5;
+
+  for (let index = 0; index < size; index++)
+    result.push(index - difference);
+    
+  return result;
+}
+
+function initDivision(a, b) {
+  return (a - (a % b)) / b;
+}
+
 export {
   point2D, distanceBetween2DPoints,
   getRequestAnimationFrameFunction, 
@@ -154,5 +173,6 @@ export {
   segmentSlope, testForColiniarity, testForPointInSegment,
   latLngToCanvasXY, randomInt,
   addHeapsortToPrototype,
-  getLanesDividers
+  getLanesDividers, getLanesDividersImproved,
+  initDivision
 };

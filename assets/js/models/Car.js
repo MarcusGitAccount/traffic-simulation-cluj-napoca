@@ -6,8 +6,7 @@ import {point2D, randomInt} from './Utils.js';
 const _road = Symbol('_road');
 const _velocity = Symbol('_velocity');
 
-const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 5};
-
+const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 2};
 
 class Car {
   constructor(id, position, width, length, lane, velocity, specs, drawingOptions = defaultDrawingOptions) {
