@@ -84,6 +84,17 @@ class LinkedList {
     
     console.log('');
   }
+  
+  *generate() {
+    let current = this.head;
+    
+    while (current) {
+      yield current;
+      current = current.next;
+    }
+    
+    
+  }
 }
 
 export default LinkedList;

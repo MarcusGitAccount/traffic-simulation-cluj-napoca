@@ -5,9 +5,11 @@
 'use strict';
 
 import {default as DirectedGraph} from './DirectedGraph.js';
+import {default as Multigraph} from './Multigraph.js';
+import {default as LinkedList} from './LinkedList.js';
 import {randomInt, testForPointInSegment, point2D} from './Utils.js';
 
-class RoadSystem extends DirectedGraph {
+class RoadSystem extends Multigraph {
   constructor(points) {
     super();
     this.points = points;
@@ -79,34 +81,61 @@ class RoadSystem extends DirectedGraph {
   }
   
   drawRoads() {
-    for (let vertex = 0; vertex < this.points.length; vertex++) {
-      this.vertexEdges(vertex).forEach((road) => {
-        road.draw();
-      });
+    for (let road = 0; road < this.points.length; road++) {
+      const roadLanes = this.vertexEdges(road);
+      
+      for (const [_, lanes] of roadLanes) {
+        if (lanes.size === 0) {
+          continue;
+        }
+
+        const generator = lanes.generate();
+        let currentLane = generator.next();
+        
+        while (currentLane.done === false) {
+          currentLane.value.data.draw();
+          currentLane = generator.next();
+        } 
+      }
     }
   }
 
   updateCars() {
-    for (let vertex = 0; vertex < this.points.length; vertex++) {
-      this.vertexEdges(vertex).forEach((road, neighborVertex) => {
-        const {start, end} = road;
+    for (let road = 0; road < this.points.length; road++) {
+      const roadLanes = this.vertexEdges(road);
+      
+      for (const [neighborVertex, lanes] of roadLanes) {
+        if (lanes.size === 0) {
+          continue;
+        }
 
-        road.adaptSpeed();
-        for (const car of road.cars) {
-          car.draw(road.slope, road.lanesInfo);
-
-          if (!testForPointInSegment(car.position, {start, end})) {
-            road.deleteCar(car);
-            if (this.vertexEdgesNumber(neighborVertex) > 0) {
-              const nextVertex = this.getRandomEdge(neighborVertex);
-              const nextRoad = this.getEdge(neighborVertex, nextVertex);
-
-              car.position = nextRoad.start;
-              nextRoad.addCar(car);
+        const generator = lanes.generate();
+        let currentLane = generator.next();
+        
+        while (currentLane.done === false) {
+          const lane = currentLane.value.data;
+          const {start, end} = lane;
+          
+          lane.adaptSpeed();
+          for (const car of lane.cars) {
+            car.draw(lane.slope, lane.lanesInfo);
+  
+            if (!testForPointInSegment(car.position, {start, end})) {
+              lane.deleteCar(car);
+              if (this.vertexEdgesNumber(neighborVertex) > 0) {
+                const nextVertex = this.getRandomEdge(neighborVertex);
+                const nextRoad = this.getEdge(neighborVertex, nextVertex);
+                const nextLane = nextRoad.head.data;
+                
+                car.position = nextLane.start;
+                nextLane.addCar(car);
+              }
             }
           }
-        }
-      });
+
+          currentLane = generator.next();
+        } 
+      }
     }
   }
 }
