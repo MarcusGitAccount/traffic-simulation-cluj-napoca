@@ -99,6 +99,10 @@ class Multigraph {
     return this[_adjacencyList][vertexId].size;
   } 
   
+  neighbours(vertex) {
+    return this[_adjacencyList][vertex];
+  }
+  
   vertexEdges(vertexId) {
     return this[_adjacencyList][vertexId];
   } 

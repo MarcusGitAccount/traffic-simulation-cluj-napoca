@@ -5,6 +5,8 @@
 'use strict';
 
 import {default as DirectedGraph} from './DirectedGraph.js';
+import {default as Queue} from './Queue.js';
+import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
 import {default as LinkedList} from './LinkedList.js';
 import {randomInt, testForPointInSegment, point2D} from './Utils.js';
@@ -23,7 +25,10 @@ class RoadSystem extends Multigraph {
   }
   
   addReveredEdge(firstVertex, secondVertex, weight) {
-    this.reversedList[firstVertex].set(secondVertex, weight);
+    if (!this.reversedList[firstVertex].get(secondVertex))
+      this.reversedList[firstVertex].set(secondVertex, new LinkedList());
+    
+    this.reversedList[firstVertex].get(secondVertex).add(weight);
   }
   
   getRandomEdge(vertexId) {
@@ -80,11 +85,54 @@ class RoadSystem extends Multigraph {
     */
   }
   
+  addDrawingPointsForLanes(start = 0, callback = null) {
+    /*
+      Make an initial call for this method before adding
+      more lanes to each road piece/edge, call it whatever
+      floats your boat.
+      
+      How it should work:
+      Create a version of bfs to traverse the graph. Additionaly,
+      you have to remember the node you came from for each one that
+      is checked during the traverse.
+      
+      For you from the next day, dumbass:
+        - You need to updated the starting/ending points for a lane
+          only if they are unset/null. Don't worry. :p
+    */
+    
+    const visited = [...new Array(this.points.length)].fill(false);
+    const previous = [...new Array(this.points.length)].fill(null);
+    const result  = [];
+    const queue = new Queue();
+    
+    visited[start] = true;
+    queue.push(start);
+    while (!queue.isEmpty) {
+      const top = queue.pop();
+      
+      // call me callback ;)
+      result.push(top);
+      for (const neighbour of this.neighbours(top).keys()) {
+        console.log(visited[neighbour], neighbour)
+        if (!visited[neighbour].checked) {
+          visited[neighbour] = true;
+          previous[neighbour] = top;
+          queue.push(neighbour);
+        }
+      }
+    }
+    
+    return {result, visited, previous};
+  }
+  
   drawRoads() {
-    for (let road = 0; road < this.points.length; road++) {
-      const roadLanes = this.vertexEdges(road);
+    for (let vertex = 0; vertex < this.points.length; vertex++) {
+      const roadLanes = this.vertexEdges(vertex);
       
       for (const [_, lanes] of roadLanes) {
+        // _ is the key, named this way because there is
+        // no need for it here
         if (lanes.size === 0) {
           continue;
         }
@@ -101,8 +149,8 @@ class RoadSystem extends Multigraph {
   }
 
   updateCars() {
-    for (let road = 0; road < this.points.length; road++) {
-      const roadLanes = this.vertexEdges(road);
+    for (let vertex = 0; vertex < this.points.length; vertex++) {
+      const roadLanes = this.vertexEdges(vertex);
       
       for (const [neighborVertex, lanes] of roadLanes) {
         if (lanes.size === 0) {
@@ -114,13 +162,13 @@ class RoadSystem extends Multigraph {
         
         while (currentLane.done === false) {
           const lane = currentLane.value.data;
-          const {start, end} = lane;
-          
+          const {start, end, drawingPoints} = lane;
+
           lane.adaptSpeed();
           for (const car of lane.cars) {
             car.draw(lane.slope, lane.lanesInfo);
   
-            if (!testForPointInSegment(car.position, {start, end})) {
+            if (!testForPointInSegment(car.position, drawingPoints)) {
               lane.deleteCar(car);
               if (this.vertexEdgesNumber(neighborVertex) > 0) {
                 const nextVertex = this.getRandomEdge(neighborVertex);

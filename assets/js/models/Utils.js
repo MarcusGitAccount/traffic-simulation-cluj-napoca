@@ -106,8 +106,6 @@ function testForPointInSegment(point, segment) {
 }
 
 function latLngToCanvasXY(coords, bounds, canvasDimensions) {
-  // console.log(coords, bounds, canvasDimensions)
-  
   return point2D(
     Math.floor(((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * canvasDimensions.width),
     Math.floor(((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * canvasDimensions.height)

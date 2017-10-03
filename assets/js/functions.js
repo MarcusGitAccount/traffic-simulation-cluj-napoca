@@ -100,8 +100,9 @@ const cars = [];
             console.log('\n', roadSystem, '\n');
             
             console.log('bfs: ', roadSystem.bfs(7));
+            console.log('bfs: ', roadSystem.addDrawingPointsForLanes(7));
             
-            costs.distances.forEach((cost ,index) => {
+/*            costs.distances.forEach((cost ,index) => {
               console.log(`Optimal cost to get from node 7 to ${index}: ${cost}`);
             });
             console.log('');
@@ -109,13 +110,13 @@ const cars = [];
               console.log(`Previous node: ${node} -> ${index}`);
             });
             
-              console.log(roadSystem.points);
-  
-              for (let edge in roadSystem.points) {
-                console.log(edge, roadSystem.vertexEdges(edge));
-              }
+            console.log(roadSystem.points);
+
+            for (let edge in roadSystem.points) {
+              console.log(edge, roadSystem.vertexEdges(edge));
+            }*/
             
-            roadSystem.debug();
+            //roadSystem.debug();
             window.requestAnimFrame(animationStep);
           }
         })
