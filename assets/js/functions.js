@@ -98,9 +98,10 @@ const cars = [];
               roads[car.id].addCar(car);
 
             console.log('\n', roadSystem, '\n');
-            
+            roadSystem.debug();
+            roadSystem.addDrawingPointsForLanes(7);
             console.log('bfs: ', roadSystem.bfs(7));
-            console.log('bfs: ', roadSystem.addDrawingPointsForLanes(7));
+            console.log('bfs: ', roadSystem.adaptedBfs(7));
             
 /*            costs.distances.forEach((cost ,index) => {
               console.log(`Optimal cost to get from node 7 to ${index}: ${cost}`);

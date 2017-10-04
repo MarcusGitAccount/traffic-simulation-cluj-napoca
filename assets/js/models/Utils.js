@@ -172,5 +172,5 @@ export {
   latLngToCanvasXY, randomInt,
   addHeapsortToPrototype,
   getLanesDividers, getLanesDividersImproved,
-  initDivision
+  initDivision, fixDecimals
 };

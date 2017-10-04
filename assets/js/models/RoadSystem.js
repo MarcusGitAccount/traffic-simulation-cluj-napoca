@@ -9,7 +9,8 @@ import {default as Queue} from './Queue.js';
 import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
 import {default as LinkedList} from './LinkedList.js';
-import {randomInt, testForPointInSegment, point2D} from './Utils.js';
+import {randomInt, testForPointInSegment, segmentToVector, 
+        angleBetween2DVectors, radToDegrees, fixDecimals} from './Utils.js';
 
 class RoadSystem extends Multigraph {
   constructor(points) {
@@ -85,10 +86,10 @@ class RoadSystem extends Multigraph {
     */
   }
   
-  addDrawingPointsForLanes(start = 0, callback = null) {
+  adaptedBfs(start = 0, callback = null) {
     /*
       Make an initial call for this method before adding
-      more lanes to each road piece/edge, call it whatever
+      more lanes to each road piece/main edge, call it whatever
       floats your boat.
       
       How it should work:
@@ -114,8 +115,7 @@ class RoadSystem extends Multigraph {
       // call me callback ;)
       result.push(top);
       for (const neighbour of this.neighbours(top).keys()) {
-        console.log(visited[neighbour], neighbour)
-        if (!visited[neighbour].checked) {
+        if (!visited[neighbour]) {
           visited[neighbour] = true;
           previous[neighbour] = top;
           queue.push(neighbour);
@@ -124,6 +124,44 @@ class RoadSystem extends Multigraph {
     }
     
     return {result, visited, previous};
+  }
+  
+  addDrawingPointsForLanes(start = 0) {
+    const bfs = this.adaptedBfs(start);
+
+    for (let vertex of bfs.result) {
+      if (bfs.previous[vertex] === null)
+        continue;
+
+      const previous = this.getEdge(bfs.previous[vertex], vertex).head.data;
+      const after = this.vertexEdges(vertex);
+      
+      for (const [_, lanes] of after) {
+        const angle = fixDecimals(
+            radToDegrees(
+              angleBetween2DVectors(
+                segmentToVector({start: previous.start, end: previous.end}),
+                segmentToVector({start: lanes.head.data.start, end: lanes.head.data.end})
+              )
+            ),
+            2
+          );
+          
+          /*
+            TODO
+            - get the half engle
+            - get point at a distance X from it, and slope of that angle starting
+              from vertex point
+            - add startings/ending !!!!!
+            - create new Road with known properties
+            - push road
+            - check in the end for lanes that do not have endings/startings (there should
+              be none I think)
+          */
+        console.log(previous, lanes.head.data);
+        console.log('Angle: ', angle);
+      }
+    }
   }
   
   drawRoads() {
@@ -143,9 +181,14 @@ class RoadSystem extends Multigraph {
         while (currentLane.done === false) {
           currentLane.value.data.draw();
           currentLane = generator.next();
-        } 
+        }
       }
     }
+  }
+
+  debug() {
+    console.log('Debugging: ');
+    console.log('First key in a map: ', this.reversedList[1].keys().next().value)
   }
 
   updateCars() {
