@@ -35,7 +35,7 @@
 'use strict';
 
 import {distanceBetween2DPoints, point2D, getLanesDividers} from './Utils.js';
-
+import {default as LinkedList} from './LinkedList.js';
 const _slope = Symbol('_slope');
 
 const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 4};
@@ -54,8 +54,8 @@ class Road {
         size: 5
       }
     */
-    this.lanesInfo['startingPoints'] = [];
-    this.lanesInfo['endingPoints'] = []; 
+    this.lanesInfo['startingPoints'] = new LinkedList();
+    this.lanesInfo['endingPoints'] = new LinkedList(); 
     this.lanesInfo['dividers'] = [-4, -2, 2, 4];// getLanesDividers(this.lanesInfo.numberOfLanes);
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;

@@ -63,7 +63,7 @@ const cars = [];
                 latLngToCanvasXY(pair.end.point, data.bounds, dimensions),
                 pair,
                 {maxSpeed: 1},
-                {numberOfLanes: 4, size: 5}
+                {numberOfLanes: 4, size: 5, directions: {up: 3, down: 1}}
               );
               
               console.log(`edge: ${pair.start.index} -> ${pair.end.index} cost: ${roadPiece.distance}`);
@@ -137,6 +137,7 @@ function animationStep(timestamp) {
 
   roadSystem.drawRoads();
   roadSystem.updateCars();
+  //roadSystem.addDrawingPointsForLanes(7);
 
   window.requestAnimFrame(animationStep);
 }

@@ -123,6 +123,23 @@ class Multigraph {
     return this[_adjacencyList][start].get(end);
   }
   
+  // return value: generator
+  getAllEdges() {
+    const result = new LinkedList();
+    
+    this.vertices.forEach(start => {
+      if (this[_adjacencyList][start].size === 0) {
+        const end = null;
+        result.add({start, end});
+      }
+      for (const end of this[_adjacencyList][start].keys()) {
+        result.add({start, end});
+      }
+    });
+    
+    return result.generate();
+  }
+  
   dfs(start) {
     this[_dfs].result = [];
     this[_dfs].visited = this[_dfs].visited.map(_ => false);

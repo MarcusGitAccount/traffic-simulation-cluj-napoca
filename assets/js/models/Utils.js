@@ -21,7 +21,7 @@ function vector2D(i, j) {
 }
 
 function segmentToVector(segment) {
-  const {start, end} = segment
+  const {start, end} = segment;
   
   return vector2D(end.x - start.x, end.y - start.y);
 }

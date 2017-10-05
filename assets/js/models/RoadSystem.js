@@ -10,7 +10,7 @@ import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
 import {default as LinkedList} from './LinkedList.js';
 import {randomInt, testForPointInSegment, segmentToVector, 
-        angleBetween2DVectors, radToDegrees, fixDecimals} from './Utils.js';
+        angleBetween2DVectors, radToDegrees, fixDecimals, point2D} from './Utils.js';
 
 class RoadSystem extends Multigraph {
   constructor(points) {
@@ -128,40 +128,69 @@ class RoadSystem extends Multigraph {
   
   addDrawingPointsForLanes(start = 0) {
     const bfs = this.adaptedBfs(start);
+    let sum = 0;
 
-    for (let vertex of bfs.result) {
-      if (bfs.previous[vertex] === null)
+    for (const pair of this.getAllEdges()) {
+      const {start, end} = pair.data;
+      const previous = bfs.previous[start];
+      
+      console.log(previous, start, end);
+    }
+    
+    for (const pair of this.getAllEdges()) {
+      
+    }
+    
+    for (let vertex = 0; vertex < this.points.length; vertex++) {
+      if (bfs.previous[vertex] === null) {
         continue;
+      }
+    
+      // console.log(`Previous: ${bfs.previous[vertex]}, Current: ${vertex}`);
 
       const previous = this.getEdge(bfs.previous[vertex], vertex).head.data;
       const after = this.vertexEdges(vertex);
-      
+      //console.log('Next:', after);
       for (const [_, lanes] of after) {
+        const DISTANCE = 10;
         const angle = fixDecimals(
-            radToDegrees(
-              angleBetween2DVectors(
-                segmentToVector({start: previous.start, end: previous.end}),
-                segmentToVector({start: lanes.head.data.start, end: lanes.head.data.end})
-              )
+            angleBetween2DVectors(
+              segmentToVector({start: previous.start, end: previous.end}),
+              segmentToVector({start: lanes.head.data.start, end: lanes.head.data.end})
             ),
             2
           );
           
-          /*
-            TODO
-            - get the half engle
-            - get point at a distance X from it, and slope of that angle starting
-              from vertex point
-            - add startings/ending !!!!!
-            - create new Road with known properties
-            - push road
-            - check in the end for lanes that do not have endings/startings (there should
-              be none I think)
-          */
-        console.log(previous, lanes.head.data);
-        console.log('Angle: ', angle);
+        /*
+          TODO
+          - get the half angle
+          - get point at a distance X from it, and slope of that angle starting
+            from vertex point
+          - add startings/ending !!!!!
+          - create new Road with known properties
+          - push road
+          - check in the end for lanes that do not have endings/startings (there should
+            be none I think)
+        */
+        
+        const slope = fixDecimals(angle / 2, 2);
+        const {x, y} = previous.end;
+
+        const newPoint = point2D(
+          x + DISTANCE * Math.cos(slope),
+          y + DISTANCE * Math.sin(slope)
+        );
+        
+        // console.log('new point location on canvas:', newPoint, this.points[vertex], vertex);
+        
+        window.globalContext.fillStyle = '#255255';
+        window.globalContext.fillRect(newPoint.x, newPoint.y, 3, 3);
+        sum++;
+    /*    console.log(previous, lanes.head.data);
+        console.log('Angle: ', angle);*/
       }
     }
+    console.log('Points drawn', sum);
   }
   
   drawRoads() {
