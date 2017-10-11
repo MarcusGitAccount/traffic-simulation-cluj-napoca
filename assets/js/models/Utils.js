@@ -159,7 +159,7 @@ function getLanesDividersImproved(size, width) {
   return result;
 }
 
-function initDivision(a, b) {
+function intDivision(a, b) {
   return (a - (a % b)) / b;
 }
 
@@ -172,5 +172,5 @@ export {
   latLngToCanvasXY, randomInt,
   addHeapsortToPrototype,
   getLanesDividers, getLanesDividersImproved,
-  initDivision, fixDecimals
+  intDivision, fixDecimals
 };

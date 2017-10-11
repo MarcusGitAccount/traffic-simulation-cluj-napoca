@@ -73,6 +73,11 @@ class LinkedList {
     return this[_length];
   }
   
+  clear() {
+    while (this.head)
+      this.head = this.head.next;
+  }
+  
   print() {
     let current = this.head;
     

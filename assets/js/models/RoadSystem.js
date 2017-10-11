@@ -4,19 +4,21 @@
 
 'use strict';
 
-import {default as DirectedGraph} from './DirectedGraph.js';
 import {default as Queue} from './Queue.js';
 import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
 import {default as LinkedList} from './LinkedList.js';
 import {randomInt, testForPointInSegment, segmentToVector, 
-        angleBetween2DVectors, radToDegrees, fixDecimals, point2D} from './Utils.js';
+        angleBetween2DVectors, fixDecimals, point2D, radToDegrees} from './Utils.js';
 
 class RoadSystem extends Multigraph {
   constructor(points) {
     super();
     this.points = points;
     this.reversedList = {};
+    this.reversedList['getEdge'] = (start, end) => {
+      return this.reversedList[start].get(end);
+    };
   }
   
   createReversed() {
@@ -44,7 +46,7 @@ class RoadSystem extends Multigraph {
     }
   }
 
-  addLane() {
+  addLanes(startingPoint = 0) {
     /*
       Solution: make the directed graph a directed multigraph
       in order to support multiple lanes between two points.
@@ -84,6 +86,41 @@ class RoadSystem extends Multigraph {
         After you got the basic lanes(A->B || B->A) call the addLanes method
         in the RoadSystem to add the lanes(edges) to the graph.
     */
+    this.addDrawingPointsForLanes(startingPoint);
+    for (const pair of this.getAllEdges()) {
+      if (pair.data.end) {
+        let {start, end} = pair.data;
+        const edge = this.getEdge(start, end).head.data;
+        let {startingPoints, endingPoints, angleStart, angleEnd} = edge.lanesInfo;
+
+        /*console.log('vertices', start, end);
+        console.log(startingPoints.length, endingPoints.length);
+        console.log(edge);*/
+
+        let startIterator = startingPoints.head;
+        let endIterator   = endingPoints.head;
+        
+        angleStart = fixDecimals(radToDegrees(angleStart), 2);
+        angleEnd   = fixDecimals(radToDegrees(angleEnd),   2);
+        console.log(`${start} -> ${end}`);
+        console.log(startingPoints.length, endingPoints.length);
+        start = parseInt(start, 10);
+        while (startIterator) {
+          const newEdge = new Road(
+            startIterator.data,
+            endIterator.data,
+            edge.coords,
+            {maxSpeed: 1}
+          );
+          
+          console.log(startIterator.data, endIterator.data, angleStart, angleEnd);
+          this.addEdge(start, end, newEdge);
+
+          startIterator = startIterator.next;
+          endIterator   = endIterator.next;
+        }
+      }
+    }
   }
   
   adaptedBfs(start = 0, callback = null) {
@@ -126,74 +163,101 @@ class RoadSystem extends Multigraph {
     return {result, visited, previous};
   }
   
+  createNewPoint(point, distance, slope) {
+    const {x, y} = point;
+    return point2D(
+      fixDecimals(x + distance * Math.cos(slope), 2),
+      fixDecimals(y + distance * Math.sin(slope), 2)
+    );
+  }
+  
   addDrawingPointsForLanes(start = 0) {
-    const bfs = this.adaptedBfs(start);
-    let sum = 0;
+    /*
+      For you from the next day: DRY, u dummie.
+      Clean this mess, please. Thanks.0
+       
+      TODO
+      - get the half angle
+      - get point at a distance X from it, and slope of that angle starting
+        from vertex point
+      - add startings/ending !!!!!
+      - create new Road with known properties
+      - push road
+      - check in the end for lanes that do not have endings/startings (there should
+        be none I think)
+    */      
 
-    for (const pair of this.getAllEdges()) {
-      const {start, end} = pair.data;
-      const previous = bfs.previous[start];
+  for (const pair of this.getAllEdges()) {
+    const {start, end} = pair.data;
+
+    if (this.reversedList[start].size === 0) {
+      const after    = this.getEdge(start, end).head.data;
+      const distance = after.lanesInfo.size;
+      const meetingPoint = after.start;
       
-      console.log(previous, start, end);
+      if (after.lanesInfo.startingPoints.length === 0) 
+        for (let index = 0; index < after.lanesInfo.numberOfLanes - 1; index++) {
+          const point = this.createNewPoint(meetingPoint, index * distance, Math.PI / 2);
+          after.lanesInfo.startingPoints.add(point);
+        }
     }
-    
-    for (const pair of this.getAllEdges()) {
-      
-    }
-    
-    for (let vertex = 0; vertex < this.points.length; vertex++) {
-      if (bfs.previous[vertex] === null) {
-        continue;
+
+    for (const previousVertex of this.reversedList[start].keys()){
+      let angle, meetingPoint, slope;
+  
+      angle = Math.PI / 2;
+      if (!end) {
+        meetingPoint = this.getEdge(previousVertex, parseInt(start, 10)).head.data.end;
       }
-    
-      // console.log(`Previous: ${bfs.previous[vertex]}, Current: ${vertex}`);
-
-      const previous = this.getEdge(bfs.previous[vertex], vertex).head.data;
-      const after = this.vertexEdges(vertex);
-      //console.log('Next:', after);
-      for (const [_, lanes] of after) {
-        const DISTANCE = 10;
-        const angle = fixDecimals(
-            angleBetween2DVectors(
-              segmentToVector({start: previous.start, end: previous.end}),
-              segmentToVector({start: lanes.head.data.start, end: lanes.head.data.end})
-            ),
-            2
-          );
-          
-        /*
-          TODO
-          - get the half angle
-          - get point at a distance X from it, and slope of that angle starting
-            from vertex point
-          - add startings/ending !!!!!
-          - create new Road with known properties
-          - push road
-          - check in the end for lanes that do not have endings/startings (there should
-            be none I think)
-        */
-        
-        const slope = fixDecimals(angle / 2, 2);
-        const {x, y} = previous.end;
-
-        const newPoint = point2D(
-          x + DISTANCE * Math.cos(slope),
-          y + DISTANCE * Math.sin(slope)
+      else {
+        const previous = this.getEdge(previousVertex, parseInt(start, 10)).head.data;
+        const after    = this.getEdge(start, end).head.data;
+  
+        meetingPoint = previous.end;
+        angle = fixDecimals(
+          angleBetween2DVectors(
+            segmentToVector({start: previous.start, end: previous.end}),
+            segmentToVector({start: after.start, end: after.end})
+          ),
+          2
         );
+      }
+
+      slope = fixDecimals(angle / 2, 2);
+      if (previousVertex) {
+        const previous = this.getEdge(previousVertex, parseInt(start, 10)).head.data;
+        const distance = previous.lanesInfo.size;
         
-        // console.log('new point location on canvas:', newPoint, this.points[vertex], vertex);
+        if (previous.lanesInfo.endingPoints.length === 0)
+          for (let index = 0; index < previous.lanesInfo.numberOfLanes - 1; index++) {
+            const point = this.createNewPoint(meetingPoint, (index + 1) * distance, slope);
+            previous.lanesInfo.angleEnd = slope;
+            previous.lanesInfo.endingPoints.add(point);
+          }
+      }
+      
+      if (end) {
+        const after    = this.getEdge(start, end).head.data;
+        const distance = after.lanesInfo.size;
         
-        window.globalContext.fillStyle = '#255255';
-        window.globalContext.fillRect(newPoint.x, newPoint.y, 3, 3);
-        sum++;
-    /*    console.log(previous, lanes.head.data);
-        console.log('Angle: ', angle);*/
+        if (after.lanesInfo.startingPoints.length === 0)
+          for (let index = 0; index < after.lanesInfo.numberOfLanes - 1; index++) {
+            const point = this.createNewPoint(meetingPoint, (index + 1) * distance, slope);
+            after.lanesInfo.angleStart = slope;
+            after.lanesInfo.startingPoints.add(point);
+          }
+        }
       }
     }
-    console.log('Points drawn', sum);
   }
   
   drawRoads() {
+    const {x, y} = {x: 534.97, y: 509.44};
+    
+    window.globalContext.fillRect(x, y, 2, 2);
+    window.globalContext.fillStyle = 'orange';
+    window.globalContext.stroke();
+    
     for (let vertex = 0; vertex < this.points.length; vertex++) {
       const roadLanes = this.vertexEdges(vertex);
       
@@ -211,13 +275,19 @@ class RoadSystem extends Multigraph {
           currentLane.value.data.draw();
           currentLane = generator.next();
         }
+        /*
+          Better and cleaner way to do it: 
+          (i leave the previous one here tho, it's fancier:)
+          
+          for (const item of lanes.generate())
+            item.data.draw();
+        */
       }
     }
   }
 
   debug() {
-    console.log('Debugging: ');
-    console.log('First key in a map: ', this.reversedList[1].keys().next().value)
+
   }
 
   updateCars() {
@@ -234,7 +304,7 @@ class RoadSystem extends Multigraph {
         
         while (currentLane.done === false) {
           const lane = currentLane.value.data;
-          const {start, end, drawingPoints} = lane;
+          const {drawingPoints} = lane;
 
           lane.adaptSpeed();
           for (const car of lane.cars) {
@@ -244,8 +314,8 @@ class RoadSystem extends Multigraph {
               lane.deleteCar(car);
               if (this.vertexEdgesNumber(neighborVertex) > 0) {
                 const nextVertex = this.getRandomEdge(neighborVertex);
-                const nextRoad = this.getEdge(neighborVertex, nextVertex);
-                const nextLane = nextRoad.head.data;
+                const nextRoad   = this.getEdge(neighborVertex, nextVertex);
+                const nextLane   = nextRoad.head.data;
                 
                 car.position = nextLane.start;
                 nextLane.addCar(car);

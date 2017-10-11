@@ -54,9 +54,13 @@ class Road {
         size: 5
       }
     */
-    this.lanesInfo['startingPoints'] = new LinkedList();
-    this.lanesInfo['endingPoints'] = new LinkedList(); 
-    this.lanesInfo['dividers'] = [-4, -2, 2, 4];// getLanesDividers(this.lanesInfo.numberOfLanes);
+    if (lanesInfo) {
+      this.lanesInfo['startingPoints'] = new LinkedList();
+      this.lanesInfo['endingPoints'] = new LinkedList(); 
+      this.lanesInfo['dividers'] = [-4, -2, 2, 4];
+      this.lanesInfo['angleStart'] = null;
+      this.lanesInfo['angleEnd'] = null;
+    }
     this.drawingOptions = drawingOptions;
     this.angleForCar = null;
     this.cars = []; //[...new Array(this.lanesInfo)];
