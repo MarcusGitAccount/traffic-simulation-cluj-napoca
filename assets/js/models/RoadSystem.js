@@ -7,11 +7,12 @@
 import {default as Queue} from './Queue.js';
 import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
+import {default as Multigraph2} from './Multigraph2.js';
 import {default as LinkedList} from './LinkedList.js';
 import {randomInt, testForPointInSegment, segmentToVector, 
         angleBetween2DVectors, fixDecimals, point2D, radToDegrees} from './Utils.js';
 
-class RoadSystem extends Multigraph {
+class RoadSystem extends Multigraph2 {
   constructor(points) {
     super();
     this.points = points;
@@ -21,13 +22,24 @@ class RoadSystem extends Multigraph {
     };
   }
   
+  reversedRoad(road) {
+    const end = point2D(
+      road.start.x - road.distance * Math.cos(road.slope),
+      road.start.y - road.distance * Math.sin(road.slope)
+    );
+    
+    return new Road(
+      road.start, end, road.coords, road.drivingOptions, road.lanesInfo
+    );
+  }
+
   createReversed() {
     this.vertices.forEach(vertex => {
       this.reversedList[vertex] = new Map();
     });
   }
   
-  addReveredEdge(firstVertex, secondVertex, weight) {
+  addReversedEdge(firstVertex, secondVertex, weight) {
     if (!this.reversedList[firstVertex].get(secondVertex))
       this.reversedList[firstVertex].set(secondVertex, new LinkedList());
     
@@ -44,6 +56,11 @@ class RoadSystem extends Multigraph {
       console.log('Coming to this point: ', this.reversedList[vertex]);
       console.log('Leaving this point: ', this.vertexEdges(vertex));
     }
+  }
+
+  // overriding/enhancing some methods
+  addEdge(a, b, weight) {
+    super.addEdge(a, b, weight);
   }
 
   addLanes(startingPoint = 0) {
@@ -190,6 +207,9 @@ class RoadSystem extends Multigraph {
   for (const pair of this.getAllEdges()) {
     const {start, end} = pair.data;
 
+    if (!this.reversedList[start])
+      continue;
+      
     if (this.reversedList[start].size === 0) {
       const after    = this.getEdge(start, end).head.data;
       const distance = after.lanesInfo.size;
@@ -324,7 +344,7 @@ class RoadSystem extends Multigraph {
           }
 
           currentLane = generator.next();
-        } 
+        }
       }
     }
   }

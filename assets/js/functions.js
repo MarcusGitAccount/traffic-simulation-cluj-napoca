@@ -68,8 +68,8 @@ const cars = [];
               
               console.log(`edge: ${pair.start.index} -> ${pair.end.index} cost: ${roadPiece.distance}`);
               roadSystem.addEdge(pair.start.index, pair.end.index, roadPiece);
-              roadSystem.addReveredEdge(pair.end.index, pair.start.index, roadPiece);
-
+              roadSystem.addReversedEdge(pair.end.index, pair.start.index, roadPiece);
+              
               roads.push(roadPiece);
             }
             
@@ -77,6 +77,14 @@ const cars = [];
           }
         })
         .then(async function(done) {
+          let road;
+          
+          road = roadSystem.getEdge(7, 6).generate().next().value.data;
+          roadSystem.addEdge(~7, 7, road);
+          road = roadSystem.getEdge(1, 0).generate().next().value.data;
+          roadSystem.addEdge(0, ~0, road);
+
+          
           if (done === true) {
             const costs = roadSystem.dijkastra(7, (road) => road.distance);
             
@@ -97,11 +105,10 @@ const cars = [];
             for (const car of cars)
               roads[car.id].addCar(car);
 
-            console.log('\n', roadSystem, '\n');
             roadSystem.debug();
-            roadSystem.addDrawingPointsForLanes(7);
-            console.log('bfs: ', roadSystem.bfs(7));
-            console.log('bfs: ', roadSystem.adaptedBfs(7));
+            //roadSystem.addLanes(7);
+            console.log(roadSystem.getEdge(6, 5));
+            console.log(roadSystem.__dfs(~7, 7));
             
 /*            costs.distances.forEach((cost ,index) => {
               console.log(`Optimal cost to get from node 7 to ${index}: ${cost}`);
@@ -137,7 +144,6 @@ function animationStep(timestamp) {
 
   roadSystem.drawRoads();
   roadSystem.updateCars();
-  //roadSystem.addDrawingPointsForLanes(7);
 
   window.requestAnimFrame(animationStep);
 }

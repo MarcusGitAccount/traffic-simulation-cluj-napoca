@@ -20,6 +20,10 @@ function vector2D(i, j) {
   return newObject;
 }
 
+function segment(start, end) {
+  return {start, end};
+}
+
 function segmentToVector(segment) {
   const {start, end} = segment;
   
@@ -35,6 +39,9 @@ function radToDegrees(angle) {
 }
 
 function angleBetween2DVectors(a, b) {
+  if (a.modulo === 0 || b.modulo)  
+    return Math.PI / 2;
+  
   return Math.acos(
     (a.i * b.i + a.j * b.j) / (a.modulo * b.modulo)
   ); // rads
@@ -172,5 +179,5 @@ export {
   latLngToCanvasXY, randomInt,
   addHeapsortToPrototype,
   getLanesDividers, getLanesDividersImproved,
-  intDivision, fixDecimals
+  intDivision, fixDecimals, segment
 };
