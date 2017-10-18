@@ -35,6 +35,18 @@ const __dfs = Symbol('__dfs');
 class Multigraph2 {
   constructor() {
     this[_adjacencyList] = {};
+    this[_dfs] = {
+      visited: [],
+      result: [],
+      dfs: (vertex) => {
+        this[_dfs].visited[vertex] = true;
+        this[_dfs].result.push(vertex);
+        
+        for (const neighbour of this[_adjacencyList][vertex])
+          if (!this[_dfs].visited[neighbour])
+            this[_dfs].dfs(neighbour);
+      }
+    };
     this[__dfs] = {
       prepared: false,
       prepare: () => {
@@ -53,25 +65,18 @@ class Multigraph2 {
       },
       dfs: (previous, current) => {
         this[__dfs].visited[current] = true;
+        
+        if (this[_adjacencyList][current].size > 0) {
+          const next = this[_adjacencyList][current].keys().next().value;
+          
+          this[__dfs].result.push(this[__dfs].objectResult(previous, current, next));
+        }
+        
         for (const [neighbour, edge] of this[_adjacencyList][current]) {
-          console.log(neighbour)
-          if (!this[__dfs].visited[neighbour] && neighbour >= 0) {
-            this[__dfs].result.push(this[__dfs].objectResult(previous, current, neighbour));
+          if (!this[__dfs].visited[neighbour]) {
             this[__dfs].dfs(current, neighbour);
           }
         }
-      }
-    };
-    this[_dfs] = {
-      visited: [],
-      result: [],
-      dfs: (vertex) => {
-        this[_dfs].visited[vertex] = true;
-        this[_dfs].result.push(vertex);
-        
-        for (const neighbour of this[_adjacencyList][vertex])
-          if (!this[_dfs].visited[neighbour])
-            this[_dfs].dfs(neighbour);
       }
     };
   }
@@ -80,8 +85,6 @@ class Multigraph2 {
     // create new list
     // initially each vertex represents a leaf node
     for (const id of vertexIds) {
-      if (id >= 0)
-        this[_adjacencyList][-id] = new Map();
       this[_adjacencyList][id] = new Map();
       this[_dfs].visited[id] = false;
     }
@@ -185,7 +188,6 @@ class Multigraph2 {
   }
   
   __dfs(previous, current) {
-    console.log(this[__dfs])
     this[__dfs].prepare();
     this[__dfs].result = [];
     this[__dfs].dfs(previous, current);

@@ -99,7 +99,7 @@ function checkIfCloseAFToZero(value) {
   return Math.abs(value) < 1e-10;
 }
 
-function fixDecimals(nbr, points) {
+function fixDecimals(nbr, points = 0) {
 	const phase = Math.pow(10, points);
 
 	return Math.floor(nbr * phase) / phase;

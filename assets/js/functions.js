@@ -78,10 +78,10 @@ const cars = [];
         })
         .then(async function(done) {
           let road;
-          
-          road = roadSystem.getEdge(7, 6).generate().next().value.data;
+
+          road = roadSystem.reversedRoad(roadSystem.getEdge(7, 6).generate().next().value.data);
           roadSystem.addEdge(~7, 7, road);
-          road = roadSystem.getEdge(1, 0).generate().next().value.data;
+          road = roadSystem.reversedRoad(roadSystem.getEdge(1, 0).generate().next().value.data, true);
           roadSystem.addEdge(0, ~0, road);
 
           
@@ -106,25 +106,9 @@ const cars = [];
               roads[car.id].addCar(car);
 
             roadSystem.debug();
-            //roadSystem.addLanes(7);
-            console.log(roadSystem.getEdge(6, 5));
-            console.log(roadSystem.__dfs(~7, 7));
+            roadSystem.upsDowns({prev: ~7, current: 7});
             
-/*            costs.distances.forEach((cost ,index) => {
-              console.log(`Optimal cost to get from node 7 to ${index}: ${cost}`);
-            });
-            console.log('');
-            costs.previousNodes.forEach((node, index) => {
-              console.log(`Previous node: ${node} -> ${index}`);
-            });
-            
-            console.log(roadSystem.points);
-
-            for (let edge in roadSystem.points) {
-              console.log(edge, roadSystem.vertexEdges(edge));
-            }*/
-            
-            //roadSystem.debug();
+            console.log(roadSystem);
             window.requestAnimFrame(animationStep);
           }
         })
@@ -137,9 +121,6 @@ const cars = [];
 })();
 
 function animationStep(timestamp) {
-  // find a better way to reset the canvas
-  // this seems to work for Chrome, not sure for other browsers
-
   window.globalContext.clearRect(0, 0, canvas.width, canvas.height);
 
   roadSystem.drawRoads();

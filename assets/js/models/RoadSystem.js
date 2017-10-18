@@ -20,16 +20,28 @@ class RoadSystem extends Multigraph2 {
     this.reversedList['getEdge'] = (start, end) => {
       return this.reversedList[start].get(end);
     };
+    this.laneCoords = [];
   }
   
-  reversedRoad(road) {
-    const end = point2D(
-      road.start.x - road.distance * Math.cos(road.slope),
-      road.start.y - road.distance * Math.sin(road.slope)
+  getPointForReversed(point, distance, slope) {
+    return point2D(
+      fixDecimals(point.x - distance * Math.cos(slope), 2),
+      fixDecimals(point.y - distance * Math.sin(slope), 2)
     );
-    
+  }
+  
+  reversedRoad(road, leaving = false) {
+    if (leaving)
+      return new Road(
+        road.end, 
+        this.getPointForReversed(road.end, road.distance, road.slope), 
+        road.coords, road.drivingOptions, road.lanesInfo
+      );
+      
     return new Road(
-      road.start, end, road.coords, road.drivingOptions, road.lanesInfo
+      this.getPointForReversed(road.start, road.distance, road.slope), 
+      road.start, 
+      road.coords, road.drivingOptions, road.lanesInfo
     );
   }
 
@@ -62,7 +74,28 @@ class RoadSystem extends Multigraph2 {
   addEdge(a, b, weight) {
     super.addEdge(a, b, weight);
   }
-
+  
+  // @params: start: {prev, current}
+  upsDowns(start) {
+    const dfsResult = this.__dfs(start.prev, start.current);
+    
+    for (const anglePoints of dfsResult) {
+      const {previous, current, next} = anglePoints;
+      const comingEdge = this.getEdge(previous, current).generate().next().value.data;
+      const leavingEdge = this.getEdge(current, next).generate().next().value.data;
+      
+      const angle = fixDecimals(
+        angleBetween2DVectors(
+          segmentToVector({start: leavingEdge.start, end: leavingEdge.end}),
+          segmentToVector({start: comingEdge.start, end: comingEdge.end})
+        ),
+        2
+      );
+      console.log(segmentToVector({start: leavingEdge.start, end: leavingEdge.end}), segmentToVector({start: comingEdge.start, end: comingEdge.end}))
+      console.log(leavingEdge.start, leavingEdge.end, previous, current, next, comingEdge.slope, leavingEdge.slope, fixDecimals(radToDegrees(angle), 2));
+    }
+  }
+  
   addLanes(startingPoint = 0) {
     /*
       Solution: make the directed graph a directed multigraph
