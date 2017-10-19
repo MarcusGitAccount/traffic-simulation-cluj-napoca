@@ -39,8 +39,8 @@ function radToDegrees(angle) {
 }
 
 function angleBetween2DVectors(a, b) {
-  if (a.modulo === 0 || b.modulo)  
-    return Math.PI / 2;
+  if (b.modulo == 0)  
+    throw new Error('Division by zero.');
   
   return Math.acos(
     (a.i * b.i + a.j * b.j) / (a.modulo * b.modulo)

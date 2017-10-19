@@ -31,16 +31,9 @@ class RoadSystem extends Multigraph2 {
   }
   
   reversedRoad(road, leaving = false) {
-    if (leaving)
-      return new Road(
-        road.end, 
-        this.getPointForReversed(road.end, road.distance, road.slope), 
-        road.coords, road.drivingOptions, road.lanesInfo
-      );
-      
     return new Road(
-      this.getPointForReversed(road.start, road.distance, road.slope), 
-      road.start, 
+      road.end, 
+      this.getPointForReversed(road.end, road.distance, road.slope), 
       road.coords, road.drivingOptions, road.lanesInfo
     );
   }
@@ -81,18 +74,17 @@ class RoadSystem extends Multigraph2 {
     
     for (const anglePoints of dfsResult) {
       const {previous, current, next} = anglePoints;
-      const comingEdge = this.getEdge(previous, current).generate().next().value.data;
-      const leavingEdge = this.getEdge(current, next).generate().next().value.data;
       
-      const angle = fixDecimals(
-        angleBetween2DVectors(
-          segmentToVector({start: leavingEdge.start, end: leavingEdge.end}),
-          segmentToVector({start: comingEdge.start, end: comingEdge.end})
-        ),
-        2
-      );
-      console.log(segmentToVector({start: leavingEdge.start, end: leavingEdge.end}), segmentToVector({start: comingEdge.start, end: comingEdge.end}))
-      console.log(leavingEdge.start, leavingEdge.end, previous, current, next, comingEdge.slope, leavingEdge.slope, fixDecimals(radToDegrees(angle), 2));
+      const comingEdge  = this.getEdge(previous, current).generate().next().value.data;
+      const leavingEdge = this.getEdge(current, next).generate().next().value.data;
+
+      const previousVector = segmentToVector({start: comingEdge.start,  end: comingEdge.end});
+      const afterVector    = segmentToVector({start: leavingEdge.start, end: leavingEdge.end});
+      const angle = fixDecimals(angleBetween2DVectors(previousVector, afterVector), 2);
+ 
+      console.log(previous, current, next);
+      console.log(previousVector, afterVector, fixDecimals(radToDegrees(angle), 2));
+
     }
   }
   
@@ -265,15 +257,12 @@ class RoadSystem extends Multigraph2 {
       else {
         const previous = this.getEdge(previousVertex, parseInt(start, 10)).head.data;
         const after    = this.getEdge(start, end).head.data;
-  
+        const previousVector = segmentToVector({start: previous.start, end: previous.end});
+        const afterVector = segmentToVector({start: after.start, end: after.end});
+        
+        
         meetingPoint = previous.end;
-        angle = fixDecimals(
-          angleBetween2DVectors(
-            segmentToVector({start: previous.start, end: previous.end}),
-            segmentToVector({start: after.start, end: after.end})
-          ),
-          2
-        );
+        angle = fixDecimals(angleBetween2DVectors(previousVector, afterVector), 2);
       }
 
       slope = fixDecimals(angle / 2, 2);
