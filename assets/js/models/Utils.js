@@ -6,7 +6,7 @@ function point2D(x, y) {
   return {x, y};
 }
 
-function vector2D(i, j) {
+function vector2D(i, j, distance) {
   const newObject = {i, j};
   const modulo = function() {
     return Math.sqrt(this.i * this.i + this.j * this.j);
@@ -24,10 +24,14 @@ function segment(start, end) {
   return {start, end};
 }
 
-function segmentToVector(segment) {
+function segmentToVector(segment, distance) {
   const {start, end} = segment;
   
-  return vector2D(end.x - start.x, end.y - start.y);
+  if (!distance) {
+    distance = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - end.x, 2));
+  }
+  
+  return vector2D(end.x - start.x, end.y - start.y, distance);
 }
 
 function degreesToRad(angle) {

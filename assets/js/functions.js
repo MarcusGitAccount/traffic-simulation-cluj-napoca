@@ -35,7 +35,7 @@ const cars = [];
         .then(async function(data) {
           let temp;
 
-          // every canvas is drawn in the 4th square of the XoY system
+          // every canvas is drawn in the 4th square of the 2d XoY system
           // thus you have to invert the bottom and top oY(latitude in this case) bounds
           // swap(bottom, top)
           
@@ -51,8 +51,8 @@ const cars = [];
         })
         .then(async function(response) {
           const dimensions = {
-            width: canvas.width,
-            height: canvas.height
+            width: canvas.width - 100,
+            height: canvas.height - 100
           };
           const {done, data} = response;
           
@@ -106,7 +106,7 @@ const cars = [];
               roads[car.id].addCar(car);
 
             roadSystem.debug();
-            roadSystem.upsDowns({prev: ~7, current: 7});
+            roadSystem.setup({prev: ~7, current: 7});
             
             console.log(roadSystem);
             window.requestAnimFrame(animationStep);
@@ -123,6 +123,7 @@ const cars = [];
 function animationStep(timestamp) {
   window.globalContext.clearRect(0, 0, canvas.width, canvas.height);
 
+  roadSystem.drawUpsDowns();
   roadSystem.drawRoads();
   roadSystem.updateCars();
 

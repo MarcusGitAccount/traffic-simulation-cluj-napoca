@@ -126,6 +126,7 @@ module.exports = (router) => {
         return Promise.resolve({bounds, centerSquarePoints, pointsArray});
     })
       .then((data) => {
+        
         response.setHeader('Cache-Control', 'no-cache');
         response.status(200).json({pairs: data.centerSquarePoints, bounds: data.bounds, points: data.pointsArray});
       })

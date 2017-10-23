@@ -21,19 +21,20 @@ class RoadSystem extends Multigraph2 {
       return this.reversedList[start].get(end);
     };
     this.laneCoords = [];
+    this.upsDownsCoords = [];
   }
   
   getPointForReversed(point, distance, slope) {
     return point2D(
-      fixDecimals(point.x - distance * Math.cos(slope), 2),
-      fixDecimals(point.y - distance * Math.sin(slope), 2)
+      fixDecimals(point.x + distance * Math.cos(slope), 2),
+      fixDecimals(point.y + distance * Math.sin(slope), 2)
     );
   }
   
   reversedRoad(road, leaving = false) {
     return new Road(
       road.end, 
-      this.getPointForReversed(road.end, road.distance, road.slope), 
+      this.getPointForReversed(road.end, -road.distance, road.slope), 
       road.coords, road.drivingOptions, road.lanesInfo
     );
   }
@@ -69,7 +70,8 @@ class RoadSystem extends Multigraph2 {
   }
   
   // @params: start: {prev, current}
-  upsDowns(start) {
+  createUpsDownsCoords(start) {
+    const upsDownsList = [];
     const dfsResult = this.__dfs(start.prev, start.current);
     
     for (const anglePoints of dfsResult) {
@@ -80,11 +82,40 @@ class RoadSystem extends Multigraph2 {
 
       const previousVector = segmentToVector({start: comingEdge.start,  end: comingEdge.end});
       const afterVector    = segmentToVector({start: leavingEdge.start, end: leavingEdge.end});
-      const angle = fixDecimals(angleBetween2DVectors(previousVector, afterVector), 2);
+      const angle = angleBetween2DVectors(previousVector, afterVector);
  
-      console.log(previous, current, next);
-      console.log(previousVector, afterVector, fixDecimals(radToDegrees(angle), 2));
-
+      upsDownsList.push({
+        up: comingEdge.end,
+        down: this.getPointForReversed(comingEdge.end, 10, angle / 2)
+      });
+      
+      console.log(previous, current, next, fixDecimals(radToDegrees(angle) / 2, 2));
+    }
+    
+    console.log(upsDownsList);
+    return upsDownsList;
+  }
+  
+  setup(start) {
+    this.upsDownsCoords = this.createUpsDownsCoords(start);
+  }
+  
+  drawUpsDowns() {
+    for (const pair of this.upsDownsCoords) {
+      const {up, down} = pair;
+      
+      window.globalContext.fillStyle = 'orange';
+      window.globalContext.fillRect(up.x, up.y, 5, 5);
+      window.globalContext.fillStyle = 'cyan';
+      window.globalContext.fillRect(down.x, down.y, 5, 5);
+      
+      
+      window.globalContext.beginPath();
+      window.globalContext.lineWidth = 2;
+      window.globalContext.moveTo(up.x, up.y);
+      window.globalContext.lineTo(down.x, down.y);
+      window.globalContext.stroke();
+      
     }
   }
   
@@ -294,12 +325,6 @@ class RoadSystem extends Multigraph2 {
   }
   
   drawRoads() {
-    const {x, y} = {x: 534.97, y: 509.44};
-    
-    window.globalContext.fillRect(x, y, 2, 2);
-    window.globalContext.fillStyle = 'orange';
-    window.globalContext.stroke();
-    
     for (let vertex = 0; vertex < this.points.length; vertex++) {
       const roadLanes = this.vertexEdges(vertex);
       
@@ -328,9 +353,7 @@ class RoadSystem extends Multigraph2 {
     }
   }
 
-  debug() {
-
-  }
+  debug() {}
 
   updateCars() {
     for (let vertex = 0; vertex < this.points.length; vertex++) {
@@ -359,8 +382,10 @@ class RoadSystem extends Multigraph2 {
                 const nextRoad   = this.getEdge(neighborVertex, nextVertex);
                 const nextLane   = nextRoad.head.data;
                 
-                car.position = nextLane.start;
-                nextLane.addCar(car);
+                if (nextVertex !== ~neighborVertex) {
+                  car.position = nextLane.start;
+                  nextLane.addCar(car);
+                }
               }
             }
           }
