@@ -9,8 +9,11 @@ import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
 import {default as Multigraph2} from './Multigraph2.js';
 import {default as LinkedList} from './LinkedList.js';
-import {randomInt, testForPointInSegment, segmentToVector, 
-        angleBetween2DVectors, fixDecimals, point2D, radToDegrees} from './Utils.js';
+import {
+  randomInt, testForPointInSegment, segmentToVector, 
+  angleBetween2DVectors, fixDecimals, point2D, radToDegrees,
+  bisectingVector
+} from './Utils.js';
 
 class RoadSystem extends Multigraph2 {
   constructor(points) {
@@ -74,22 +77,31 @@ class RoadSystem extends Multigraph2 {
     const upsDownsList = [];
     const dfsResult = this.__dfs(start.prev, start.current);
     
+    const absoluteValue = (value) => {
+      const {i, j} = value;
+      
+      return Math.sqrt(i * i + j * j);
+    };
+    
     for (const anglePoints of dfsResult) {
       const {previous, current, next} = anglePoints;
       
       const comingEdge  = this.getEdge(previous, current).generate().next().value.data;
       const leavingEdge = this.getEdge(current, next).generate().next().value.data;
-
+    
       const previousVector = segmentToVector({start: comingEdge.start,  end: comingEdge.end});
       const afterVector    = segmentToVector({start: leavingEdge.start, end: leavingEdge.end});
-      const angle = angleBetween2DVectors(previousVector, afterVector);
+      const bisection      = bisectingVector(previousVector, afterVector, false, 10);
+
+      console.log('bisection\'s position vector:', bisection);
+      console.log('bisection\'s absolute value:', fixDecimals(absoluteValue(bisection), 2));
  
       upsDownsList.push({
         up: comingEdge.end,
-        down: this.getPointForReversed(comingEdge.end, 10, angle / 2)
+        down: point2D(comingEdge.end.x + bisection.i, comingEdge.end.y + bisection.j)
       });
       
-      console.log(previous, current, next, fixDecimals(radToDegrees(angle) / 2, 2));
+      // console.log(previous, current, next, fixDecimals(radToDegrees(angle) / 2, 2));
     }
     
     console.log(upsDownsList);

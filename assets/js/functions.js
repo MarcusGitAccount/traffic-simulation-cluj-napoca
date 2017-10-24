@@ -51,8 +51,8 @@ const cars = [];
         })
         .then(async function(response) {
           const dimensions = {
-            width: canvas.width - 100,
-            height: canvas.height - 100
+            width: canvas.width,
+            height: canvas.height
           };
           const {done, data} = response;
           
@@ -66,7 +66,7 @@ const cars = [];
                 {numberOfLanes: 4, size: 5, directions: {up: 3, down: 1}}
               );
               
-              console.log(`edge: ${pair.start.index} -> ${pair.end.index} cost: ${roadPiece.distance}`);
+              //console.log(`edge: ${pair.start.index} -> ${pair.end.index} cost: ${roadPiece.distance}`);
               roadSystem.addEdge(pair.start.index, pair.end.index, roadPiece);
               roadSystem.addReversedEdge(pair.end.index, pair.start.index, roadPiece);
               
