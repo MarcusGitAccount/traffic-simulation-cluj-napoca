@@ -97,6 +97,7 @@ class RoadSystem extends Multigraph2 {
       console.log('bisection\'s absolute value:', fixDecimals(absoluteValue(bisection), 2));
  
       upsDownsList.push({
+        verticesPair: [previous, current], 
         up: comingEdge.end,
         down: point2D(comingEdge.end.x + bisection.i, comingEdge.end.y + bisection.j)
       });
@@ -109,27 +110,32 @@ class RoadSystem extends Multigraph2 {
   }
   
   setup(start) {
-    this.upsDownsCoords = this.createUpsDownsCoords(start);
+    const upsDownsCoords = this.createUpsDownsCoords(start);
+    
+    for (const pair of upsDownsCoords) {
+      const [startVertex, endVertex] = this.up
+      
+      console.log(this.getEdge());
+    }
   }
   
-  drawUpsDowns() {
+  /*drawUpsDowns() {
     for (const pair of this.upsDownsCoords) {
       const {up, down} = pair;
-      
-      window.globalContext.fillStyle = 'orange';
-      window.globalContext.fillRect(up.x, up.y, 5, 5);
+
+      //window.globalContext.fillStyle = 'orange';
+      //window.globalContext.fillRect(up.x, up.y, 5, 5);
       window.globalContext.fillStyle = 'cyan';
-      window.globalContext.fillRect(down.x, down.y, 5, 5);
-      
-      
+      window.globalContext.fillRect(down.x, down.y, 2, 2);
+
       window.globalContext.beginPath();
       window.globalContext.lineWidth = 2;
       window.globalContext.moveTo(up.x, up.y);
       window.globalContext.lineTo(down.x, down.y);
       window.globalContext.stroke();
-      
+
     }
-  }
+  }*/
   
   addLanes(startingPoint = 0) {
     /*

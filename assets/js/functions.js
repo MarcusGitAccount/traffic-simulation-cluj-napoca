@@ -123,7 +123,7 @@ const cars = [];
 function animationStep(timestamp) {
   window.globalContext.clearRect(0, 0, canvas.width, canvas.height);
 
-  roadSystem.drawUpsDowns();
+  // roadSystem.drawUpsDowns();
   roadSystem.drawRoads();
   roadSystem.updateCars();
 
