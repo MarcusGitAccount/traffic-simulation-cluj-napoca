@@ -19,14 +19,25 @@ class RoadSystem extends Multigraph2 {
   constructor(points) {
     super();
     this.points = points;
+    this.pointsVersors = Array.from({
+      length: points.length
+    }, () => { 
+      return {
+        versor: {
+          i: 0, 
+          j: 0
+        },
+        scalar: 10,
+        timesLanes: 2 
+      }; 
+    });
     this.reversedList = {};
     this.reversedList['getEdge'] = (start, end) => {
       return this.reversedList[start].get(end);
     };
     this.laneCoords = [];
-    this.upsDownsCoords = [];
   }
-  
+
   getPointForReversed(point, distance, slope) {
     return point2D(
       fixDecimals(point.x + distance * Math.cos(slope), 2),
@@ -73,8 +84,8 @@ class RoadSystem extends Multigraph2 {
   }
   
   // @params: start: {prev, current}
-  createUpsDownsCoords(start) {
-    const upsDownsList = [];
+  createPointsVersors(start) {
+    const result = [];
     const dfsResult = this.__dfs(start.prev, start.current);
     
     const absoluteValue = (value) => {
@@ -91,32 +102,19 @@ class RoadSystem extends Multigraph2 {
     
       const previousVector = segmentToVector({start: comingEdge.start,  end: comingEdge.end});
       const afterVector    = segmentToVector({start: leavingEdge.start, end: leavingEdge.end});
-      const bisection      = bisectingVector(previousVector, afterVector, false, 10);
+      const bisection      = bisectingVector(previousVector, afterVector, false, 1);
 
-      console.log('bisection\'s position vector:', bisection);
-      console.log('bisection\'s absolute value:', fixDecimals(absoluteValue(bisection), 2));
- 
-      upsDownsList.push({
-        verticesPair: [previous, current], 
-        up: comingEdge.end,
-        down: point2D(comingEdge.end.x + bisection.i, comingEdge.end.y + bisection.j)
-      });
-      
-      // console.log(previous, current, next, fixDecimals(radToDegrees(angle) / 2, 2));
+      /*
+       !!!!!
+       When you will change the api remeber to add the scalar for each 
+       point of each edge and nubmer of lanes of course, duh :).
+      */
+      this.pointsVersors[current].versor = bisection;
     }
-    
-    console.log(upsDownsList);
-    return upsDownsList;
   }
   
   setup(start) {
-    const upsDownsCoords = this.createUpsDownsCoords(start);
-    
-    for (const pair of upsDownsCoords) {
-      const [startVertex, endVertex] = this.up
-      
-      console.log(this.getEdge());
-    }
+    this.createPointsVersors(start);
   }
   
   /*drawUpsDowns() {
