@@ -9,7 +9,7 @@ import {default as Road} from './models/Road.js';
 import {default as RoadSystem} from './models/RoadSystem.js';
 import {
   getRequestAnimationFrameFunction as getRequestAnimFrame, 
-  latLngToCanvasXY,
+  latLngToCanvasXY, point2D
 } from './models/Utils.js';
 
 const canvas = document.querySelector('canvas');
@@ -25,8 +25,8 @@ const colorsArray = ['#E65100', '#607D8B', 'red', 'cyan', 'pink', '#1B5E20', '#1
 const cars = [];
 
 (function init() {
-  canvas.width  = 1000;
-  canvas.height = 650;
+  canvas.width  = 1220;
+  canvas.height = 770;
 
   window.fetch(`${window.location.origin}/api/points`)
         .then(async function(response) {
@@ -50,17 +50,19 @@ const cars = [];
           return Promise.resolve({done: true, data: data});
         })
         .then(async function(response) {
+          const FRAME_WIDTH = 50;
           const dimensions = {
-            width: canvas.width,
-            height: canvas.height
+            width:  canvas.width  - FRAME_WIDTH * 2,
+            height: canvas.height - FRAME_WIDTH * 2
           };
+          const offset = point2D(FRAME_WIDTH, -FRAME_WIDTH)
           const {done, data} = response;
           
           if (done) {
             for (const pair of data.pairs) {
               const roadPiece = new Road(
-                latLngToCanvasXY(pair.start.point, data.bounds, dimensions),
-                latLngToCanvasXY(pair.end.point, data.bounds, dimensions),
+                latLngToCanvasXY(pair.start.point, data.bounds, dimensions, offset),
+                latLngToCanvasXY(pair.end.point, data.bounds, dimensions, offset),
                 pair,
                 {maxSpeed: 1},
                 {numberOfLanes: 4, size: 5, directions: {up: 3, down: 1}}

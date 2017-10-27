@@ -34,7 +34,7 @@
 */
 'use strict';
 
-import {distanceBetween2DPoints, point2D, getLanesDividers} from './Utils.js';
+import {distanceBetween2DPoints, point2D, segmentToVector} from './Utils.js';
 import {default as LinkedList} from './LinkedList.js';
 const _slope = Symbol('_slope');
 
@@ -48,23 +48,11 @@ class Road {
     this.drawingPoints = {start, end};
     this.coords = coords;
     this.distance = Math.floor(distanceBetween2DPoints(start, end));
-    this.lanesInfo = lanesInfo; /*
-      Example: this.lanesInfo: {
-        numberOfLanes: 4,
-        size: 5
-      }
-    */
-    if (lanesInfo) {
-      this.lanesInfo['startingPoints'] = new LinkedList();
-      this.lanesInfo['endingPoints'] = new LinkedList(); 
-      this.lanesInfo['dividers'] = [-4, -2, 2, 4];
-      this.lanesInfo['angleStart'] = null;
-      this.lanesInfo['angleEnd'] = null;
-    }
-    this.drawingOptions = drawingOptions;
-    this.angleForCar = null;
+    this.lanesInfo = lanesInfo; 
     this.cars = []; //[...new Array(this.lanesInfo)];
+    this.drawingOptions = drawingOptions;
     this.drivingOptions = drivingOptions;
+    this.positionVector = segmentToVector({start, end});
     this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
   }
   

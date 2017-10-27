@@ -12,7 +12,7 @@ import {default as LinkedList} from './LinkedList.js';
 import {
   randomInt, testForPointInSegment, segmentToVector, 
   angleBetween2DVectors, fixDecimals, point2D, radToDegrees,
-  bisectingVector
+  bisectingVector, multiplyVectorByScalar
 } from './Utils.js';
 
 class RoadSystem extends Multigraph2 {
@@ -21,8 +21,10 @@ class RoadSystem extends Multigraph2 {
     this.points = points;
     this.pointsVersors = Array.from({
       length: points.length
-    }, () => { 
+    }, (_, index) => { 
       return {
+        coordsXoY: null,
+        coordsLatLng: this.points[index],
         versor: {
           i: 0, 
           j: 0
@@ -35,7 +37,6 @@ class RoadSystem extends Multigraph2 {
     this.reversedList['getEdge'] = (start, end) => {
       return this.reversedList[start].get(end);
     };
-    this.laneCoords = [];
   }
 
   getPointForReversed(point, distance, slope) {
@@ -46,6 +47,8 @@ class RoadSystem extends Multigraph2 {
   }
   
   reversedRoad(road, leaving = false) {
+    
+    
     return new Road(
       road.end, 
       this.getPointForReversed(road.end, -road.distance, road.slope), 
@@ -100,21 +103,58 @@ class RoadSystem extends Multigraph2 {
       const comingEdge  = this.getEdge(previous, current).generate().next().value.data;
       const leavingEdge = this.getEdge(current, next).generate().next().value.data;
     
-      const previousVector = segmentToVector({start: comingEdge.start,  end: comingEdge.end});
-      const afterVector    = segmentToVector({start: leavingEdge.start, end: leavingEdge.end});
+      const previousVector = comingEdge.positionVector;
+      const afterVector    = leavingEdge.positionVector;
       const bisection      = bisectingVector(previousVector, afterVector, false, 1);
 
+      if (current == 7) {
+        console.log(comingEdge.start, leavingEdge.end);
+      }
       /*
        !!!!!
        When you will change the api remeber to add the scalar for each 
        point of each edge and nubmer of lanes of course, duh :).
       */
+      this.pointsVersors[current].coordsXoY = comingEdge.end;
       this.pointsVersors[current].versor = bisection;
     }
   }
   
   setup(start) {
     this.createPointsVersors(start);
+    
+    for (const edge of this.getAllEdges()) {
+      const startingPoint = edge.data.start;
+      const endingPoint   = edge.data.end;
+      
+      
+      if (startingPoint>= 0 && endingPoint >= 0) {
+        console.log(startingPoint, endingPoint);
+        const startingVersor = multiplyVectorByScalar(this.pointsVersors[startingPoint].versor, this.pointsVersors[startingPoint].scalar);
+        const endingVersor   = multiplyVectorByScalar(this.pointsVersors[endingPoint].versor, this.pointsVersors[endingPoint].scalar);
+        
+        const newEdge = new Road(
+          point2D(
+            this.pointsVersors[startingPoint].coordsXoY.x + startingVersor.i,
+            this.pointsVersors[startingPoint].coordsXoY.y + startingVersor.j
+          ),
+          point2D(
+            this.pointsVersors[endingPoint].coordsXoY.x + endingVersor.i,
+            this.pointsVersors[endingPoint].coordsXoY.y + endingVersor.j
+          ),
+          {
+            start: this.pointsVersors[startingPoint].coordsLatLng,
+            end:   this.pointsVersors[endingPoint].coordsLatLng
+          },
+          {maxSpeed: 1}
+        );
+        
+        if (startingPoint == 7)
+        console.log(newEdge);
+        this.addEdge(startingPoint, endingPoint, newEdge);
+      }
+      
+    }
   }
   
   /*drawUpsDowns() {
@@ -191,8 +231,7 @@ class RoadSystem extends Multigraph2 {
         
         angleStart = fixDecimals(radToDegrees(angleStart), 2);
         angleEnd   = fixDecimals(radToDegrees(angleEnd),   2);
-        console.log(`${start} -> ${end}`);
-        console.log(startingPoints.length, endingPoints.length);
+
         start = parseInt(start, 10);
         while (startIterator) {
           const newEdge = new Road(
@@ -202,7 +241,6 @@ class RoadSystem extends Multigraph2 {
             {maxSpeed: 1}
           );
           
-          console.log(startIterator.data, endIterator.data, angleStart, angleEnd);
           this.addEdge(start, end, newEdge);
 
           startIterator = startIterator.next;

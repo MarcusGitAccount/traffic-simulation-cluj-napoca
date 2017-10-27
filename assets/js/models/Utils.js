@@ -62,7 +62,7 @@ function addTwoVectors(a, b) {
   };
 }
 
-function multiplyByScalar(vector, scalar) {
+function multiplyVectorByScalar(vector, scalar) {
   return {
     i: vector.i * scalar,
     j: vector.j * scalar
@@ -71,10 +71,10 @@ function multiplyByScalar(vector, scalar) {
 
 function bisectingVector(vectorA, vectorB, areOpposite = false, scalar = 1) {
   const unitA = unitVector(vectorA);
-  const unitB = unitVector(multiplyByScalar(vectorB, areOpposite ? 1 : -1));
-  const result = multiplyByScalar(addTwoVectors(unitA, unitB), 0.5);
+  const unitB = unitVector(multiplyVectorByScalar(vectorB, areOpposite ? 1 : -1));
+  const result = multiplyVectorByScalar(addTwoVectors(unitA, unitB), 0.5);
 
-  return multiplyByScalar(unitVector(result), scalar);
+  return multiplyVectorByScalar(unitVector(result), scalar);
 }
 
 function angleBetween2DVectors(a, b) {
@@ -151,10 +151,12 @@ function testForPointInSegment(point, segment) {
   return fixDecimals(firstDistance, 8) === fixDecimals(secondDistance, 8);
 }
 
-function latLngToCanvasXY(coords, bounds, canvasDimensions, FRAME = 0) {
+function latLngToCanvasXY(coords, bounds, canvasDimensions, canvasOffset = point2D(0, 0)) {
+  const {width, height} = canvasDimensions;
+  
   return point2D(
-    Math.floor(((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * (canvasDimensions.width  - FRAME)),
-    Math.floor(((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * (canvasDimensions.height - FRAME))
+    Math.floor(((coords.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * width) + canvasOffset.x,
+    Math.floor(((coords.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * height) - canvasOffset.y
   );
 }
 
@@ -218,5 +220,6 @@ export {
   latLngToCanvasXY, randomInt,
   addHeapsortToPrototype,
   getLanesDividers, getLanesDividersImproved,
-  intDivision, fixDecimals, segment, bisectingVector, addTwoVectors
+  intDivision, fixDecimals, segment, bisectingVector, addTwoVectors,
+  multiplyVectorByScalar
 };
