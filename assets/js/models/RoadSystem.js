@@ -47,13 +47,10 @@ class RoadSystem extends Multigraph2 {
   }
   
   reversedRoad(road, leaving = false) {
-    
-    
-    return new Road(
-      road.end, 
-      this.getPointForReversed(road.end, -road.distance, road.slope), 
-      road.coords, road.drivingOptions, road.lanesInfo
-    );
+    return {
+      positionVector: {i: 1, j: 1},
+      draw: () => console.log('Nothing to be drawn')
+    };
   }
 
   createReversed() {
@@ -108,14 +105,14 @@ class RoadSystem extends Multigraph2 {
       const bisection      = bisectingVector(previousVector, afterVector, false, 1);
 
       if (current == 7) {
-        console.log(comingEdge.start, leavingEdge.end);
+        console.log('it\'s 7', previous, next, comingEdge, bisection);
       }
       /*
        !!!!!
        When you will change the api remeber to add the scalar for each 
        point of each edge and nubmer of lanes of course, duh :).
       */
-      this.pointsVersors[current].coordsXoY = comingEdge.end;
+      this.pointsVersors[current].coordsXoY = comingEdge.end || leavingEdge.start;
       this.pointsVersors[current].versor = bisection;
     }
   }
@@ -133,6 +130,7 @@ class RoadSystem extends Multigraph2 {
         const startingVersor = multiplyVectorByScalar(this.pointsVersors[startingPoint].versor, this.pointsVersors[startingPoint].scalar);
         const endingVersor   = multiplyVectorByScalar(this.pointsVersors[endingPoint].versor, this.pointsVersors[endingPoint].scalar);
         
+        console.log(startingPoint, this.pointsVersors[startingPoint])
         const newEdge = new Road(
           point2D(
             this.pointsVersors[startingPoint].coordsXoY.x + startingVersor.i,
@@ -391,6 +389,7 @@ class RoadSystem extends Multigraph2 {
 
         const generator = lanes.generate();
         let currentLane = generator.next();
+        
         
         while (currentLane.done === false) {
           currentLane.value.data.draw();
