@@ -34,7 +34,7 @@
 */
 'use strict';
 
-import {distanceBetween2DPoints, point2D, segmentToVector} from './Utils.js';
+import {distanceBetween2DPoints, point2D, segmentToVector, unitVector} from './Utils.js';
 import {default as LinkedList} from './LinkedList.js';
 const _slope = Symbol('_slope');
 
@@ -45,15 +45,23 @@ class Road {
   constructor(start, end, coords, drivingOptions, lanesInfo = defaultLanesInfo, drawingOptions = defaultDrawingOptions) {
     this.start = start; // x, y
     this.end = end;
-    this.drawingPoints = {start, end};
     this.coords = coords;
+    this.drawingPoints = {start, end};
+    
+    this.origin = start;
     this.distance = Math.floor(distanceBetween2DPoints(start, end));
+    this.positionVector = segmentToVector({start, end});
+    this.absoluteValue  = Math.sqrt(
+      this.positionVector.i * this.positionVector.i + 
+      this.positionVector.j * this.positionVector.j
+    );
+    this.unitVector = unitVector(this.positionVector);
+    this.slope= Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
+
     this.lanesInfo = lanesInfo; 
-    this.cars = []; //[...new Array(this.lanesInfo)];
+    this.cars = [];
     this.drawingOptions = drawingOptions;
     this.drivingOptions = drivingOptions;
-    this.positionVector = segmentToVector({start, end});
-    this[_slope] = Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
   }
   
   addCar(car, lane) {
@@ -128,10 +136,6 @@ class Road {
       else if (this.cars[index].maxSpeed > this.drivingOptions.maxSpeed)
         this.cars[index].velocity -= .55;
     }
-  }
-  
-  get slope() {
-    return this[_slope];
   }
 }
 export default Road;

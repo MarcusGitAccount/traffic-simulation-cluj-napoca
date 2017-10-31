@@ -1,45 +1,44 @@
+// Make code: (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
+
 'use strict';
 
-/*defining symbols for private variables*/
-import {point2D, randomInt} from './Utils.js';
-
-const _road = Symbol('_road');
-const _velocity = Symbol('_velocity');
-
+import {point2D, multiplyVectorByScalar} from './Utils.js';
 const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 2};
 
 class Car {
-  constructor(id, position, width, length, lane, velocity, specs, drawingOptions = defaultDrawingOptions) {
+  constructor(id, units, velocity, drawingOptions = defaultDrawingOptions) {
     this.id = id;
-    this.width = width;
-    this.length = length;
-    this.lane = lane;
+    this.origin = this.unitVector = null;
+    // scalar that is multiplied with the directions vector
+    this.units = units;
+    // traveled units on the road vector
+    // each car is just a unit vector multiplied with a scalar
+    // the unit vector of the coincides with the road's unit vector
+    this.traveled = 0;
+    // number of units to move at one frame interval
     this.velocity = velocity;
-    this.position = position;
-    this.specs = specs;
     this.drawingOptions = drawingOptions;
   }
 
-  updatePosition(angle) {
-    this.position = point2D(
-      this.position.x + Math.cos(angle) * this.velocity,
-      this.position.y + Math.sin(angle) * this.velocity
-    );
+  updatePosition() {
+    const {x, y} = this.origin;
+    const {i, j} = multiplyVectorByScalar(this.positionVector, this.velocity);
+    
+    this.traveled += this.velocity;
+    this.origin = point2D(x + i, y + j);
+  }
+
+  updateToNewRoad(origin, unitvector) {
+    this.origin = origin;
+    this.unitVector = unitvector;
+    this.traveled = 0;
   }
 
   draw(angle, roadLanesInfo) {
-    const laneSlope = -Math.pow(angle, -1);
-    
-    this.updatePosition(angle);
-
-    const {x, y} = point2D(
-      this.position.x + Math.cos(laneSlope) * roadLanesInfo.size * roadLanesInfo.dividers[this.lane],
-      this.position.y + Math.sin(laneSlope) * roadLanesInfo.size * roadLanesInfo.dividers[this.lane]
-    );
-
+    const {i, j} = multiplyVectorByScalar(this.positionVector, this.units);
     const end = point2D(
-      x + this.length * Math.cos(angle),
-      y + this.width * Math.sin(angle)
+      this.origin.x + this.length * Math.cos(angle),
+      this.origin.y + this.width * Math.sin(angle)
     );
 
     window.globalContext.beginPath();

@@ -55,7 +55,7 @@ const cars = [];
             width:  canvas.width  - FRAME_WIDTH * 2,
             height: canvas.height - FRAME_WIDTH * 2
           };
-          const offset = point2D(FRAME_WIDTH, -FRAME_WIDTH)
+          const offset = point2D(FRAME_WIDTH, -FRAME_WIDTH);
           const {done, data} = response;
           
           if (done) {
@@ -86,7 +86,6 @@ const cars = [];
           road = roadSystem.reversedRoad(roadSystem.getEdge(1, 0).generate().next().value.data, true);
           roadSystem.addEdge(0, ~0, road);
 
-          
           if (done === true) {
             const costs = roadSystem.dijkastra(7, (road) => road.distance);
             
@@ -107,7 +106,6 @@ const cars = [];
             for (const car of cars)
               roads[car.id].addCar(car);
 
-            roadSystem.debug();
             roadSystem.setup({prev: ~7, current: 7});
             
             console.log(roadSystem);

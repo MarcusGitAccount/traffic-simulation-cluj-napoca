@@ -14,6 +14,7 @@ import {default as LinkedList} from './LinkedList.js';
 
 const _adjacencyList = Symbol('_adjacencyList'); // Symbols for private properties
 const _dfs = Symbol('_dfs');
+const __dfs = Symbol('__dfs');
 
 (function updateMapPrototype() {
   Map.prototype.getKeyAtPosition = function(position) {
@@ -46,14 +47,49 @@ class Multigraph {
             this[_dfs].dfs(neighbour);
       }
     };
+    this[__dfs] = {
+      prepared: false,
+      prepare: () => {
+        if (!this.prepared) {
+          this[__dfs].visited = Array.from(
+           {length: this.vertexEdgesNumber},
+           () => false
+          );
+          this[__dfs].prepared = true;
+        }
+      },
+      result: [],
+      visited: null,
+      objectResult: (previous, current, next) => {
+        return {previous, current, next};
+      },
+      dfs: (previous, current) => {
+        this[__dfs].visited[current] = true;
+        
+        if (this[_adjacencyList][current].size > 0) {
+          const next = this[_adjacencyList][current].keys().next().value;
+          
+          this[__dfs].result.push(this[__dfs].objectResult(previous, current, next));
+        }
+        
+        for (const [neighbour, edge] of this[_adjacencyList][current]) {
+          if (!this[__dfs].visited[neighbour]) {
+            this[__dfs].dfs(current, neighbour);
+          }
+        }
+      }
+    };
   }
 
   addVertices(...vertexIds) {
     // create new list
+    // initially each vertex represents a leaf node
     for (const id of vertexIds) {
       this[_adjacencyList][id] = new Map();
       this[_dfs].visited[id] = false;
     }
+    
+    this[__dfs].prepared = false;
   } 
 
   removeVertex(vertexId) {
@@ -64,6 +100,7 @@ class Multigraph {
     }
    
     // remove edges that leave this vertex
+    this[__dfs].prepared = false;
     delete this[_adjacencyList][vertexId]; 
   } 
  
@@ -148,6 +185,14 @@ class Multigraph {
     this[_dfs].dfs(start);
 
     return this[_dfs].result;
+  }
+  
+  __dfs(previous, current) {
+    this[__dfs].prepare();
+    this[__dfs].result = [];
+    this[__dfs].dfs(previous, current);
+    
+    return this[__dfs].result;
   }
   
   bfs(start) {

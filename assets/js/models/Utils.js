@@ -221,5 +221,5 @@ export {
   addHeapsortToPrototype,
   getLanesDividers, getLanesDividersImproved,
   intDivision, fixDecimals, segment, bisectingVector, addTwoVectors,
-  multiplyVectorByScalar
+  multiplyVectorByScalar, unitVector
 };

@@ -7,7 +7,6 @@
 import {default as Queue} from './Queue.js';
 import {default as Road} from './Road.js';
 import {default as Multigraph} from './Multigraph.js';
-import {default as Multigraph2} from './Multigraph2.js';
 import {default as LinkedList} from './LinkedList.js';
 import {
   randomInt, testForPointInSegment, segmentToVector, 
@@ -15,7 +14,7 @@ import {
   bisectingVector, multiplyVectorByScalar
 } from './Utils.js';
 
-class RoadSystem extends Multigraph2 {
+class RoadSystem extends Multigraph {
   constructor(points) {
     super();
     this.points = points;
@@ -70,13 +69,13 @@ class RoadSystem extends Multigraph2 {
     return this.vertexEdges(vertexId).getKeytPosition(randomInt(0, this.vertexEdgesNumber(vertexId)));
   }
   
-  debug() {
+  /*debug() {
     for (let vertex = 0; vertex < this.points.length; vertex++) {
       console.log(`Current point: ${vertex}`);
       console.log('Coming to this point: ', this.reversedList[vertex]);
       console.log('Leaving this point: ', this.vertexEdges(vertex));
     }
-  }
+  }*/
 
   // overriding/enhancing some methods
   addEdge(a, b, weight) {
@@ -87,13 +86,7 @@ class RoadSystem extends Multigraph2 {
   createPointsVersors(start) {
     const result = [];
     const dfsResult = this.__dfs(start.prev, start.current);
-    
-    const absoluteValue = (value) => {
-      const {i, j} = value;
-      
-      return Math.sqrt(i * i + j * j);
-    };
-    
+
     for (const anglePoints of dfsResult) {
       const {previous, current, next} = anglePoints;
       
@@ -104,14 +97,6 @@ class RoadSystem extends Multigraph2 {
       const afterVector    = leavingEdge.positionVector;
       const bisection      = bisectingVector(previousVector, afterVector, false, 1);
 
-      if (current == 7) {
-        console.log('it\'s 7', previous, next, comingEdge, bisection);
-      }
-      /*
-       !!!!!
-       When you will change the api remeber to add the scalar for each 
-       point of each edge and nubmer of lanes of course, duh :).
-      */
       this.pointsVersors[current].coordsXoY = comingEdge.end || leavingEdge.start;
       this.pointsVersors[current].versor = bisection;
     }
@@ -126,11 +111,13 @@ class RoadSystem extends Multigraph2 {
       
       
       if (startingPoint>= 0 && endingPoint >= 0) {
-        console.log(startingPoint, endingPoint);
+
+        // When you will change the api remeber to add the scalar for each 
+        // point of each edge and nubmer of lanes of course, duh :).
+
         const startingVersor = multiplyVectorByScalar(this.pointsVersors[startingPoint].versor, this.pointsVersors[startingPoint].scalar);
         const endingVersor   = multiplyVectorByScalar(this.pointsVersors[endingPoint].versor, this.pointsVersors[endingPoint].scalar);
         
-        console.log(startingPoint, this.pointsVersors[startingPoint])
         const newEdge = new Road(
           point2D(
             this.pointsVersors[startingPoint].coordsXoY.x + startingVersor.i,
@@ -147,32 +134,12 @@ class RoadSystem extends Multigraph2 {
           {maxSpeed: 1}
         );
         
-        if (startingPoint == 7)
-        console.log(newEdge);
         this.addEdge(startingPoint, endingPoint, newEdge);
       }
-      
     }
   }
   
-  /*drawUpsDowns() {
-    for (const pair of this.upsDownsCoords) {
-      const {up, down} = pair;
-
-      //window.globalContext.fillStyle = 'orange';
-      //window.globalContext.fillRect(up.x, up.y, 5, 5);
-      window.globalContext.fillStyle = 'cyan';
-      window.globalContext.fillRect(down.x, down.y, 2, 2);
-
-      window.globalContext.beginPath();
-      window.globalContext.lineWidth = 2;
-      window.globalContext.moveTo(up.x, up.y);
-      window.globalContext.lineTo(down.x, down.y);
-      window.globalContext.stroke();
-
-    }
-  }*/
-  
+  // OUTDATED
   addLanes(startingPoint = 0) {
     /*
       Solution: make the directed graph a directed multigraph
@@ -247,7 +214,7 @@ class RoadSystem extends Multigraph2 {
       }
     }
   }
-  
+  // OUTDATED
   adaptedBfs(start = 0, callback = null) {
     /*
       Make an initial call for this method before adding
@@ -287,15 +254,7 @@ class RoadSystem extends Multigraph2 {
     
     return {result, visited, previous};
   }
-  
-  createNewPoint(point, distance, slope) {
-    const {x, y} = point;
-    return point2D(
-      fixDecimals(x + distance * Math.cos(slope), 2),
-      fixDecimals(y + distance * Math.sin(slope), 2)
-    );
-  }
-  
+  // OUTDATED
   addDrawingPointsForLanes(start = 0) {
     /*
       For you from the next day: DRY, u dummie.
@@ -376,6 +335,14 @@ class RoadSystem extends Multigraph2 {
     }
   }
   
+  createNewPoint(point, distance, slope) {
+    const {x, y} = point;
+    return point2D(
+      fixDecimals(x + distance * Math.cos(slope), 2),
+      fixDecimals(y + distance * Math.sin(slope), 2)
+    );
+  }
+  
   drawRoads() {
     for (let vertex = 0; vertex < this.points.length; vertex++) {
       const roadLanes = this.vertexEdges(vertex);
@@ -406,8 +373,6 @@ class RoadSystem extends Multigraph2 {
     }
   }
 
-  debug() {}
-
   updateCars() {
     for (let vertex = 0; vertex < this.points.length; vertex++) {
       const roadLanes = this.vertexEdges(vertex);
@@ -426,6 +391,7 @@ class RoadSystem extends Multigraph2 {
 
           lane.adaptSpeed();
           for (const car of lane.cars) {
+            car.updatePosition();
             car.draw(lane.slope, lane.lanesInfo);
   
             if (!testForPointInSegment(car.position, drawingPoints)) {
