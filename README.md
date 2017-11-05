@@ -1,4 +1,4 @@
-# traffic-simulation-cluj-napoca
+# Traffic Simulator for Cluj-Napoca
 
 ### Severely undocumented repo, future updates will fix this.
 
@@ -8,11 +8,19 @@ This projects aims to create a traffic simulator for Cluj-Napoca, Romania. The f
 
 http://prntscr.com/gke16s
 
-## Currently developed features
+## Currently developed
 
-- Models for roads, cars
-- Utils for maths formulas that need to used
-- Basic car movement(cars currently followed the roads and more roads can be added, everyuthing is scalable)
+- Roadsystem created with a multigraph and linked lists of 2D vectors. (as seen here: http://prntscr.com/h6ht77)
+- Math utils for linear algebra problems that occured during the project development and more.
+- Mockup api for fetching the points for the roads.
+- Data structures such as Queue, Stack, BinaryHeap, PriorityQueue, LinkedList, Multigraph etc..
+- Models suchs as Road, Car (they are currently in development)
+
+## Currently working on:
+
+- Updating the Car model and creating the AI for cars. (will be using graphs to easy work with distances between cars)
+- Updating the Road model
+- Enhancing the API.
 
 ## Installation
 
@@ -20,7 +28,15 @@ http://prntscr.com/gke16s
 - npm i
 - npm start
 
+Note: 
+1°. You may have to change the environment variables IP and PORT as they are by default set to 0.0.0.0 and 8080.
+2°. No transcripters/loaders such as babel are used to transforms the ES6 code. The project makes use of the ES6 module system and             await/async implemented in Chrome's 61 V8 engine.
+3°. The api is currently just a mockup that sends data collected from Google Maps by hand. :(
+
+## Technologies used:
+- NodeJS version > 8.5.0
+- 2D canvas api
+
 ## License
 
-<a href="https://github.com/MarcusGitAccount/traffic-simulation-cluj-napoca/blob/master/gplv3.txt">License link</a>
-
+<a href="https://github.com/MarcusGitAccount/traffic-simulation-cluj-napoca/blob/master/gplv3.txt">License link(gplv3)</a>
