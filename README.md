@@ -24,7 +24,16 @@ http://prntscr.com/gke16s
 - Enhancing the API.
 - 2D Car representation and physics (acceleration, deceleration, braking, ground friction, steering, maintaining distance from
   objects near, overtaking other cars in the same lane, changing lanes, etc..)
- - Create a 2D Vector model with the basic operations needed and putting togheter the existing utilitary functions in the the class Vector2D
+ - Creating a 2D Vector model with the basic operations needed and putting togheter the existing utilitary functions in the the class Vector2D
+ - Changing the road friction based on the weather type(dry road = standard, wet road, snowy, etc..)
+
+## TO-DO:
+
+- create a user dashboard for inserting multiple cars
+- create an interface for users to select the area of the city to simulate traffic on
+- create weather conditions
+- add road obstacles
+
 
 ## Installation
 
