@@ -22,6 +22,9 @@ http://prntscr.com/gke16s
 - Updating the Car model and creating the AI for cars. (will be using graphs to easy work with distances between cars)
 - Updating the Road model
 - Enhancing the API.
+- 2D Car representation and physics (acceleration, deceleration, braking, ground friction, steering, maintaining distance from
+  objects near, overtaking other cars in the same lane, changing lanes, etc..)
+ - Create a 2D Vector model with the basic operations needed and putting togheter the existing utilitary functions in the the class Vector2D
 
 ## Installation
 
