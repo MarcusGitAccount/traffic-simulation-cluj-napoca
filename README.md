@@ -43,7 +43,7 @@ http://prntscr.com/gke16s
 
 _Notes_: 
 - _1°_. You may have to change the environment variables IP and PORT as they are by default set to 0.0.0.0 and 8080.
-- _2°_. No transcripters/loaders such as babel are used to transforms the ES6 code. The project makes use of the ES6 module system and &ensp&ensp&ensp&ensp&ensp&enspawait/async implemented in Chromes 61's V8 engine.
+- _2°_. No transcripters/loaders such as babel are used to transforms the ES6 code. The project makes use of the ES6 module system and await/async implemented in Chromes 61's V8 engine.
 - _3°_. The api is currently just a mockup that sends data collected from Google Maps by hand. :(
 
 ## Technologies used:
