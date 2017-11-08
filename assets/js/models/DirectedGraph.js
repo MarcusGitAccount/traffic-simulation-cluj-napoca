@@ -155,7 +155,7 @@ class DirectedGraph {
       }
     */
     
-    const INF = Math.pow(2, 31) - 1;
+    const INF = ~(1 << 31);
     const queue = new PriorityQueue((parent, child) => parent.weight < child.weight);
     const size = this.veritecesNumber;
     const distances = [...new Array(size)].fill(INF);

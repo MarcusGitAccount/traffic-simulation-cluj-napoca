@@ -42,7 +42,6 @@ function radToDegrees(angle) {
   return angle * 180 / Math.PI;
 }
 
-
 // @param: vector, Object, {i, j, modulo<get>} (vector2D)
 function unitVector(vector) {
   let {i, j} = vector;

@@ -3,7 +3,11 @@
 'use strict';
 
 import {point2D, multiplyVectorByScalar} from './Utils.js';
-const defaultDrawingOptions = {strokeColor: '#ff0000', lineWidth: 2};
+
+const defaultDrawingOptions = {
+  strokeColor: '#ff0000', 
+  lineWidth: 2
+};
 
 class Car {
   constructor(id, units, velocity, drawingOptions = defaultDrawingOptions) {
@@ -20,6 +24,11 @@ class Car {
     this.drawingOptions = drawingOptions;
   }
 
+  /*
+    Dumb idea:
+      Make the cars in a lane a graph.
+  */
+
   updatePosition() {
     const {x, y} = this.origin;
     const {i, j} = multiplyVectorByScalar(this.positionVector, this.velocity);
@@ -33,12 +42,21 @@ class Car {
     this.unitVector = unitvector;
     this.traveled = 0;
   }
-
+  
+  accelerate() {
+    
+  }
+  
+  decelerate() {
+    
+  }
+  
   draw(angle, roadLanesInfo) {
+    const {x, y} = this.origin;
     const {i, j} = multiplyVectorByScalar(this.positionVector, this.units);
     const end = point2D(
-      this.origin.x + this.length * Math.cos(angle),
-      this.origin.y + this.width * Math.sin(angle)
+      x + i,
+      y + j
     );
 
     window.globalContext.beginPath();

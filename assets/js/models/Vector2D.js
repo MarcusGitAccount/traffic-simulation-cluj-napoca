@@ -1,33 +1,44 @@
 'use strict';
 
 //  Make code: (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
-
 export default class Vector2D {
-  /*
-    @param origin: point2D {x, y}
-    @param magnitude: Number
-    @param direction: Object, {i, j}
-  */
-  constructor(origin, magnitude, direction) {
-    this.origin = origin;
-    this.magnitude = magnitude;
-    this.direction = direction;
+  constructor(i = 0, j = 0) {
+    this.versors.i = i;
+    this.versors.j = j;
   }
-  
-  get absoluteValue() {
-    return Math.sqrt(
-      Math.pow(this.direction.i, 2),
-      Math.pow(this.direction.j, 2)
-    );
-  }
-  
-  /*
-    @params start, end: point2D {x, y}
-  */
-  static vectorFromSegment(start, end) {
-    //this.constructor(start, end, {i: 1, j: 3});
-    
 
-    return this;
+  scalarMultiplication(scalar) {
+    this.versors.i *= scalar;
+    this.versors.j *= scalar;
+  
+    return this.versors;
   }
+  
+  set origin(point) {
+    this.origin = point;
+  }
+
+  get absoluteValue() {
+    const {i, j} = this.versors;
+    
+    return Math.sqrt(i * i + j * j);
+  }
+  
+  static segmentToVector(segment) {
+    const i = segment.end.x - segment.start.x;
+    const j = segment.end.y - segment.start.y;
+    
+    return {i, j};
+  }
+  
+  static unitVector(vector = this.versors) {
+    let {i, j} = vector;
+    const absoluteValue = Math.sqrt(i * i +  j * j);
+    const unitDownscale = 1 / absoluteValue;
+    
+    i *= unitDownscale;
+    j *= unitDownscale;
+    
+    return {i, j};
+  }  
 }

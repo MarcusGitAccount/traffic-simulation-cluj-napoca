@@ -1,26 +1,6 @@
 'use strict';
 
 const fetch = require('node-fetch');
-const proj4 = require('proj4');
-
-const projections = {
-  utm: "+proj=utm +zone=34t",
-  wgs84: "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
-};
-
-function startEnd(start, end) {
-  return {start, end};
-}
-
-function getUtm(coords) {
-  const result =  proj4(projections.wgs84, projections.utm, [coords.lng, coords.lat]);
-  
-  return {
-    easting: result[0], // oX
-    northing: result[1] // oY
-  };
-}
-
 
 module.exports = (router) => {
   router.get('/', (request, response) => {
@@ -56,7 +36,7 @@ module.exports = (router) => {
     },
     {  
       end: {lat: 46.77488095105854,lng: 23.589667275956423},
-      start:   {lat: 46.77411916855766,lng: 23.590376558733723},
+      start: {lat: 46.77411916855766,lng: 23.590376558733723},
     },
     {  
       end: {lat: 46.77419829442854,lng: 23.592122984174388},
@@ -64,7 +44,7 @@ module.exports = (router) => {
     },
     { 
       end: {lat: 46.77411916855766,lng: 23.590376558733723},
-      start:   {lat: 46.77370555612028,lng: 23.58821318920320}
+      start: {lat: 46.77370555612028,lng: 23.58821318920320}
     }
     ]})
       .then(async function(data) {
