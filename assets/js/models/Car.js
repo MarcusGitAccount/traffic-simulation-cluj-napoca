@@ -22,6 +22,13 @@ class Car {
     // number of units to move at one frame interval
     this.velocity = velocity;
     this.drawingOptions = drawingOptions;
+    /* The following properties are there in order to calculate forces that apply to the car.*/
+    this.frictionCoefficient = 0.3;
+    this.frontalArea = 2.2; // square meters
+    
+    //
+    this.horsePower = 100;
+    this.torque     = 1;
   }
 
   /*
