@@ -3,6 +3,10 @@
 'use strict';
 
 import {point2D, multiplyVectorByScalar} from './Utils.js';
+import VectorOperations from './Vector2D.js';
+import {multiplyVectorByScalar} from './Utils.js';
+import {default as environmentConstants} from '../constants.js';
+
 
 const defaultDrawingOptions = {
   strokeColor: '#ff0000', 
@@ -20,21 +24,69 @@ class Car {
     // the unit vector of the coincides with the road's unit vector
     this.traveled = 0;
     // number of units to move at one frame interval
-    this.velocity = velocity;
     this.drawingOptions = drawingOptions;
     /* The following properties are there in order to calculate forces that apply to the car.*/
-    this.frictionCoefficient = 0.3;
-    this.frontalArea = 2.2; // square meters
     
-    //
-    this.horsePower = 100;
-    this.torque     = 1;
+    this.environmentConstants = environmentConstants;
+    
+    this.carConstants = {
+      frictionCoefficient: 0.3,
+      frontalArea: 2.2, // square meters
+      horsePower: 100,
+      torque: 1, // Nm => Force * distance
+      weight: 1000, // kg
+      maxRpm: 7000 // max revolutions per minute
+    };
+    
+    this.forces = {
+      velocity: VectorOperations.nullVectorVersors(),
+      traction: VectorOperations.nullVectorVersors(),
+      airDrag:  VectorOperations.nullVectorVersors(),
+      rollingResistance: VectorOperations.nullVectorVersors()
+    };
   }
 
-  /*
-    Dumb idea:
-      Make the cars in a lane a graph.
-  */
+  get speed() {
+    return this.forces.velocity.absoluteValue;
+  }
+  
+  cdrag() {
+    
+  }
+  
+  fdrag() {
+    
+  }
+  
+  
+  ftraction() {
+    
+  }
+  
+  get cbraking() {
+    
+  }
+  
+  fbraking() {
+    const versors = this.forces.velocity.unitDownscale;
+    
+    return multiplyVectorByScalar(versors, this.cbraking);
+  }
+  
+  
+  flong() {
+    const vl = this.forces.velocity.versors;
+    const ad = this.forces.velocity.airDrag;
+    const rr = this.forces.velocity.rollingResistance;
+    
+    const i  = vl.i + ad.i + rr.i;
+    const j  = vl.j + ad.j + rr.j; 
+    
+    // resistance forces are in opposite directions from the traction
+    // => at constast speeds the long force is 0
+  
+    return new Vector({i, j});
+  }
 
   updatePosition() {
     const {x, y} = this.origin;

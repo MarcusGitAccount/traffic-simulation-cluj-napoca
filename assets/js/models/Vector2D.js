@@ -1,44 +1,62 @@
 'use strict';
 
 //  Make code: (∩°-°)⊃━ ☆ﾟ.*･｡ﾟ
-export default class Vector2D {
-  constructor(i = 0, j = 0) {
-    this.versors.i = i;
-    this.versors.j = j;
-  }
+export default class VectorOperations {
 
-  scalarMultiplication(scalar) {
-    this.versors.i *= scalar;
-    this.versors.j *= scalar;
-  
-    return this.versors;
+  // set components/versors, whatever
+  static setVersors(i, j) {
+    return {i, j};
   }
   
-  set origin(point) {
-    this.origin = point;
+  // @param segment: {point2D, point2d}
+  static segmentToVersors(segment) {
+    const {start, end} = segment;
+    
+    return this.setVersors(end.x - start.x, end.y - start.y);
   }
 
-  get absoluteValue() {
-    const {i, j} = this.versors;
+  static absoluteValue(versors) {
+    const {i, j} = versors;
     
     return Math.sqrt(i * i + j * j);
   }
   
-  static segmentToVector(segment) {
-    const i = segment.end.x - segment.start.x;
-    const j = segment.end.y - segment.start.y;
-    
-    return {i, j};
+  static addVectors(...vectors) {
+    return (
+      vectors.reduce((total, current) => {
+        total.i += current.i;
+        total.j += current.j;
+        
+        return total;
+      }, this.nullVector())  
+    );
   }
   
-  static unitVector(vector = this.versors) {
-    let {i, j} = vector;
-    const absoluteValue = Math.sqrt(i * i +  j * j);
-    const unitDownscale = 1 / absoluteValue;
+  static scalarMultiplication(versors, scalar = 1) {
+    versors.i *= scalar;
+    versors.j *= scalar;
     
-    i *= unitDownscale;
-    j *= unitDownscale;
+    return versors;
+  }
+  
+  static scalarProduct(...vectors) {
+    const result = vectors.reduce((total, current) => {
+      total.i += current.i;
+      total.j += current.j;
+      
+      return total;
+    }, this.nullVector());
     
-    return {i, j};
-  }  
+    return result.i + result.j;
+  }
+  
+  static unitVector(versors) {
+    const unitDownscale = 1 / this.absoluteValue(versors);
+
+    return this.scalarMultiplication(versors, unitDownscale);
+  }
+  
+  static nullVector() {
+    return this.setVersors(0, 0);
+  }
 }

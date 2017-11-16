@@ -33,7 +33,7 @@ class Forces {
     return this.velocity.absoluteValue;
   }
   
-  get longitudinalForce() {
+  get flong() {
     const i = this.velocity.versors.i + this.dragForce.versors.i + this.rollingResistance.versors.i;
     const j = this.velocity.versors.j + this.dragForce.versors.j + this.rollingResistance.versors.j;
   
