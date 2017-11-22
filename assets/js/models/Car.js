@@ -74,7 +74,7 @@ class Car {
     return vop.scalarMul(
       vop.unitDownscale(this.velocity),
       this.engineforce
-    )
+    );
   }
    
   fbraking() {
@@ -113,7 +113,6 @@ class Car {
   }
 
   updatePosition() {
-    
   }
   
   /*
@@ -131,9 +130,10 @@ class Car {
     this.traveled = 0;
   }
   */
+  
   draw(angle, roadLanesInfo) {
     const {x, y} = this.origin;
-    const {i, j} = scalarMul(this.positionVector, this.units);
+    const {i, j} = vop.scalarMul(this.positionVector, this.units);
     const end = point2D(
       x + i,
       y + j
