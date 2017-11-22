@@ -21,7 +21,7 @@ export default class VectorOperations {
     return Math.sqrt(i * i + j * j);
   }
   
-  static addVectors(...vectors) {
+  static add(...vectors) {
     return (
       vectors.reduce((total, current) => {
         total.i += current.i;
@@ -32,28 +32,21 @@ export default class VectorOperations {
     );
   }
   
-  static scalarMultiplication(versors, scalar = 1) {
+  static scalarMul(versors, scalar = 1) {
     versors.i *= scalar;
     versors.j *= scalar;
     
     return versors;
   }
   
-  static scalarProduct(...vectors) {
-    const result = vectors.reduce((total, current) => {
-      total.i += current.i;
-      total.j += current.j;
-      
-      return total;
-    }, this.nullVector());
-    
-    return result.i + result.j;
+  static dotProd(a, b) {
+    return a.i * b.i + a.j + b.j;
   }
   
   static unitVector(versors) {
     const unitDownscale = 1 / this.absoluteValue(versors);
 
-    return this.scalarMultiplication(versors, unitDownscale);
+    return this.scalarMul(versors, unitDownscale);
   }
   
   static nullVector() {

@@ -184,3 +184,4 @@ export function getLanesDividersImproved(size, width) {
 }
 export function intDivision(a, b) {
   return (a - (a % b)) / b;
+}

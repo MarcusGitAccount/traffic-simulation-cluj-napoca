@@ -5,7 +5,6 @@ const path = require('path');
 const morgan = require('morgan');
 const express = require('express');
 const bodyParser = require('body-parser');
-const proj4 = require('proj4');
 
 const fetch = require('node-fetch');
 

@@ -389,7 +389,6 @@ class RoadSystem extends Multigraph {
           const lane = currentLane.value.data;
           const {drawingPoints} = lane;
 
-          lane.adaptSpeed();
           for (const car of lane.cars) {
             car.updatePosition();
             car.draw(lane.slope, lane.lanesInfo);
