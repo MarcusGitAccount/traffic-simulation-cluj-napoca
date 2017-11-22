@@ -9,5 +9,11 @@ export default {
         }
       }
     }
+  },
+  carTypes: {
+    a: {
+      frontalArea: 2.2, // m^2
+      frictionCoef: 0.3
+    }
   }
 };

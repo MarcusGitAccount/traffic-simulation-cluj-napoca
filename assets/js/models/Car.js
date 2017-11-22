@@ -38,23 +38,31 @@ class Car {
       maxRpm: 7000 // max revolutions per minute
     };
     
+    this.positionVector = vop.nullVector();
     this.velocity       = vop.nullVector();
     this.acceleratation = vop.nullVector();
+    
+    // this.carType
   }
 
   get engineforce() {
     return this.carConstants.torque * this.carConstants.rpm / 5252;
   }
 
+  // checked
   get speed() {
     // in rendering should be the 60th part(60 fps)
     return vop.absoluteValue(this.velocity);
   }
   
+  // checked
   get c_drag() {
     // https://en.wikipedia.org/wiki/Automobile_drag_coefficient
     // depends on the type of the car
-    return .3;
+    const {frictionCoefficient, frontalArea} = this.carConstants;
+    const {rho} = this.environmentConstants;
+    
+    return .5 * frictionCoefficient * frontalArea * rho;
   }
 
   get c_braking() {}
@@ -63,6 +71,7 @@ class Car {
     return this.c_drag * 30;
   }
 
+  // checked
   fdrag() {
     return vop.scalarMul(
       this.velocity,
@@ -86,33 +95,44 @@ class Car {
     );
   }
   
+  // checked
   frollingresistance() {
     return vop.scalarMul(
       -this.c_rollingresistance,
       this.velocity
     );
-  }
+  } 
   
+  // checked  
   flong() {
-    const vl = this.ftraction;
-    const ad = this.fdrag;
-    const rr = this.frollingresistance;
+    const vl = this.ftraction();
+    const ad = this.fdrag();
+    const rr = this.frollingresistance();
        
     // resistance forces are in opposite directions from the traction
     // => at constast speeds the long force is 0
   
+
     return vop.add(vl, ad, rr);
   }
 
+  // checked
   get acceleratation() {
     return vop.scalarMul(this.flong(), 1 / this.weight);
   }
 
   fvelocity(timeDifference) {
-    this.velocity = vop.add(this.velocity, vop.scalarMul(this.acceleratation, timeDifference));
+    this.velocity = vop.add(
+      this.velocity, 
+      vop.scalarMul(this.acceleratation, timeDifference)
+    );
   }
 
-  updatePosition() {
+  updatePosition(timeDifference) {
+    this.positionVector = vop.add(
+      this.positionVector,
+      vop.scalarMul(this.velocity, timeDifference)
+    );
   }
   
   /*
