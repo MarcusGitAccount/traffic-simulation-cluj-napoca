@@ -3,7 +3,7 @@
 'use strict';
 
 import {point2D} from './Utils.js';
-import {default as vop} from './Vector2D.js';
+import * as vop from './VectorsOperations.js';
 import {default as environmentConstants} from '../constants.js';
 
 const defaultDrawingOptions = {
@@ -14,19 +14,18 @@ const defaultDrawingOptions = {
 class Car {
   constructor(id, units, velocity, roadConstants, drawingOptions = defaultDrawingOptions) {
     this.id = id;
-    this.origin = this.unitVector = null;
     // scalar that is multiplied with the directions vector
     this.units = units;
     // traveled units on the road vector
     // each car is just a unit vector multiplied with a scalar
     // the unit vector of the coincides with the road's unit vector
-    this.traveled = 0;
+    this.travelled = 0;
     // number of units to move at one frame interval
     this.drawingOptions = drawingOptions;
     /* The following properties are there in order to calculate forces that apply to the car.*/
     
     this.environmentConstants = environmentConstants;
-    
+    this.rpm = 1000;
     this.currentRoadConstants = roadConstants;
 
     this.carConstants = {
@@ -38,24 +37,20 @@ class Car {
       maxRpm: 7000 // max revolutions per minute
     };
     
-    this.positionVector = vop.nullVector();
-    this.velocity       = vop.nullVector();
-    this.acceleratation = vop.nullVector();
-    
-    // this.carType
+    this.position = vop.zero();
+    this.velocity = vop.zero();
   }
+  // => to increase overall acceleration => you increase rpm
 
   get engineforce() {
-    return this.carConstants.torque * this.carConstants.rpm / 5252;
+    return this.carConstants.torque * this.rpm / 5252;
   }
 
-  // checked
   get speed() {
     // in rendering should be the 60th part(60 fps)
-    return vop.absoluteValue(this.velocity);
+    return vop.norm(this.velocity);
   }
   
-  // checked
   get c_drag() {
     // https://en.wikipedia.org/wiki/Automobile_drag_coefficient
     // depends on the type of the car
@@ -71,31 +66,29 @@ class Car {
     return this.c_drag * 30;
   }
 
-  // checked
   fdrag() {
-    return vop.scalarMul(
+    return vop.multiply(
       this.velocity,
       -this.c_drag * this.speed
     );
   }
     
   ftraction() {
-    return vop.scalarMul(
-      vop.unitDownscale(this.velocity),
+    return vop.multiply(
+      vop.unit(this.velocity),
       this.engineforce
     );
   }
    
   fbraking() {
-    return vop.scalarMul(
-      vop.scalarMul(
-        vop.unitDownscale(this.velocity), -1
+    return vop.multiply(
+      vop.multiply(
+        vop.unit(this.velocity), -1
       ),
       this.c_braking
     );
   }
   
-  // checked
   frollingresistance() {
     return vop.scalarMul(
       -this.c_rollingresistance,
@@ -103,7 +96,6 @@ class Car {
     );
   } 
   
-  // checked  
   flong() {
     const vl = this.ftraction();
     const ad = this.fdrag();
@@ -112,36 +104,28 @@ class Car {
     // resistance forces are in opposite directions from the traction
     // => at constast speeds the long force is 0
   
-
     return vop.add(vl, ad, rr);
   }
 
-  // checked
   get acceleratation() {
-    return vop.scalarMul(this.flong(), 1 / this.weight);
+    const F = vop.add(this.flong(), this.engineforce());
+
+    return vop.multiply(this.flong(), 1 / this.weight);
   }
 
-  fvelocity(timeDifference) {
+  update(timeDifference, callback = null) {
+    this.position = vop.add(
+      this.position,
+      vop.multiply(this.velocity, timeDifference)
+    );
+
     this.velocity = vop.add(
       this.velocity, 
-      vop.scalarMul(this.acceleratation, timeDifference)
+      vop.multiply(this.acceleratation, timeDifference)
     );
-  }
 
-  updatePosition(timeDifference) {
-    this.positionVector = vop.add(
-      this.positionVector,
-      vop.scalarMul(this.velocity, timeDifference)
-    );
-  }
-  
-  /*
-  updatePosition() {
-    const {x, y} = this.origin;
-    const {i, j} = vop.scalarMul(this.positionVector, this.velocity);
-    
-    this.traveled += this.velocity;
-    this.origin = point2D(x + i, y + j);
+    if (callback != null)
+      callback.call(this);
   }
 
   updateToNewRoad(origin, unitvector) {
@@ -149,11 +133,10 @@ class Car {
     this.unitVector = unitvector;
     this.traveled = 0;
   }
-  */
   
   draw(angle, roadLanesInfo) {
     const {x, y} = this.origin;
-    const {i, j} = vop.scalarMul(this.positionVector, this.units);
+    const {i, j} = vop.multiply(this.positionVector, this.units);
     const end = point2D(
       x + i,
       y + j

@@ -1,3 +1,5 @@
+'use strict';
+
 function add(...vectors) {
   return vectors.reduce((total, current) => {
     for (let i = 0; i < current.length; i++)
@@ -8,7 +10,7 @@ function add(...vectors) {
 }
 
 function multiply(vector, scalar) {
-  const result = [...vector];
+  const result = copy(vector);
   
   return result.map(component => component * scalar);
 } 
@@ -23,7 +25,7 @@ function norm(vector, product = dot) {
   return Math.sqrt(product(vector, vector));
 }
 
-function normalization(vector, product = dot) {
+function unit(vector, product = dot) {
   const magnitude = norm(vector, product);
   
   return multiply(vector, 1 / magnitude);
@@ -33,23 +35,22 @@ function copy(vector) {
   return [...vector];
 }
 
-function orthogonalization(...base) {
-  const result = [];
+function zero(dimension = 2) {
+  return Array.from({
+    length: dimension
+  }, () => 0);
+}
 
-  for (let i = 0; i < base.length; i++) {
-    const current  = copy(base[i]);
-    let   modified = copy(base[i]); 
+function segmentToVersors(segment) {
+  const vector = Array.from({length: segment.start.length});
+  
+  for (let index = 0; index < vector.length; index++)
+    vector[index++] = segment.end[index] - segment.start[index];
 
-    for (let j = 0; j < i; j++) {
-      const pos = base[j];
-      const coefficient = -dot(current, pos) / dot(pos, pos);
-      
-      console.log(coefficient)
-      modified = add(modified, multiply(pos, coefficient));
-    }
+  return vector;
+}
 
-    result.push(modified);
-  }
-
-  return result;
+export {
+  add, multiply, dot, unit, copy,
+  zero, segmentToVersors, norm
 }
