@@ -14,7 +14,7 @@ const defaultDrawingOptions = {
 class Car {
   constructor(id, units, velocity, roadConstants, drawingOptions = defaultDrawingOptions) {
     this.id = id;
-    // scalar that is multiplied with the directions vector
+    // size of the car
     this.units = units;
     // traveled units on the road vector
     // each car is just a unit vector multiplied with a scalar
@@ -39,11 +39,13 @@ class Car {
     
     this.position = vop.zero();
     this.velocity = vop.zero();
+
+    this.road
   }
   // => to increase overall acceleration => you increase rpm
 
   get engineforce() {
-    return this.carConstants.torque * this.rpm / 5252;
+    return this.carConstants.torque * this.rpm / 5252; // => horse power
   }
 
   get speed() {
@@ -128,9 +130,9 @@ class Car {
       callback.call(this);
   }
 
-  updateToNewRoad(origin, unitvector) {
-    this.origin = origin;
-    this.unitVector = unitvector;
+  updateToNewRoad(origin, roadDirectionUnitVector) {
+    this.position = origin;
+    this.velocity = roadDirectionUnitVector;
     this.traveled = 0;
   }
   

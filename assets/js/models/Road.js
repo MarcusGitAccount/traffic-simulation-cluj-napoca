@@ -1,9 +1,10 @@
 'use strict';
 
-import {distanceBetween2DPoints, point2D, segmentToVector, unitVector} from './Utils.js';
+import {point2D} from './Utils.js';
 import {default as LinkedList} from './LinkedList.js';
-const _slope = Symbol('_slope');
+import * as vop from './VectorsOperations.js';
 
+const _slope = Symbol('_slope');
 const defaultDrawingOptions = {strokeColor: 'grey', lineWidth: 4};
 const defaultLanesInfo = {numberOfLanes: 1, size: 4};
 
@@ -13,15 +14,11 @@ class Road {
     this.end = end;
     this.coords = coords;
     this.drawingPoints = {start, end};
-    
     this.origin = start;
-    this.distance = Math.floor(distanceBetween2DPoints(start, end));
-    this.positionVector = segmentToVector({start, end});
-    this.absoluteValue  = Math.sqrt(
-      this.positionVector.i * this.positionVector.i + 
-      this.positionVector.j * this.positionVector.j
-    );
-    this.unitVector = unitVector(this.positionVector);
+  
+    this.positionVector = vop.segmentToVersors({start, end});
+    this.distance = vop.norm(this.positionVector);
+    this.unitVector = vop.unit(this.positionVector);
     this.slope= Math.atan2(this.end.y - this.start.y, this.end.x - this.start.x);
 
     this.lanesInfo = lanesInfo; 
